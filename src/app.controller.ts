@@ -1,12 +1,61 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  // todo remove on production
+  @Get('login')
+  login(@Res() res) {
+    const domain = this.config.get<string>('auth0.domain');
+    const clientId = this.config.get<string>('auth0.clientId');
+    const callbackUrl = this.config.get<string>('auth0.callbackUrl');
+
+    return res.redirect(
+      `https://${domain}/authorize?` +
+        `response_type=code&` +
+        `client_id=${clientId}&` +
+        `redirect_uri=${callbackUrl}&` +
+        `scope=openid%20profile%20email&` +
+        `code_challenge_method=none`,
+    );
+  }
+
+  // todo remove in production
+  @Get('auth/callback')
+  async callback(@Req() req, @Res() res) {
+    const code: string = req.query.code || '';
+
+    const domain = this.config.get<string>('auth0.domain');
+    const clientId = this.config.get<string>('auth0.clientId');
+    const callbackUrl = this.config.get<string>('auth0.callbackUrl');
+    const clientSecret = this.config.get<string>('auth0.clientSecret');
+
+    const tokenResponse = await axios.post(`https://${domain}/oauth/token`, {
+      grant_type: 'authorization_code',
+      client_id: clientId,
+      client_secret: clientSecret,
+      code,
+      redirect_uri: callbackUrl,
+    });
+
+    // tokenResponse.data contains:
+    // access_token
+    // id_token
+    // token_type
+    // expires_in
+
+    return res.json(tokenResponse.data);
   }
 }
