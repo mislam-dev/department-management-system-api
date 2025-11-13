@@ -1,0 +1,2001 @@
+openapi: 3.0.3
+info:
+  title: Academic Management API
+  description: "API for managing users, roles, students, teachers, courses, schedules, attendance, activities, notices, and reports. Generated from provided SRS and ER diagram. Assumes JWT Bearer authentication, ISO 8601 timestamps, and camelCase property naming."
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: https://api.example.com/v1
+    description: Primary server
+tags:
+  - name: Authentication
+    description: Login and password operations
+  - name: Roles
+    description: Role management
+  - name: Users
+    description: User management and profiles
+  - name: Students
+    description: Student records and enrollment
+  - name: Teachers
+    description: Teacher records
+  - name: Semesters
+    description: Semester management
+  - name: Courses
+    description: Courses and course details
+  - name: CourseSchedules
+    description: Course scheduling
+  - name: Attendance
+    description: Attendance records
+  - name: Activities
+    description: Activities and logs
+  - name: Notices
+    description: Notices and attachments
+  - name: Reports
+    description: Reports generation
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Login
+      description: Exchange username and password for JWT tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthLoginRequest"
+            example:
+              username: johndoe
+              password: SecretPass123
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/BadRequest"
+              examples:
+                success:
+                  value:
+                    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+                    refreshToken: abcd1234refresh
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get current user data
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: user objects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /auth/profile:
+    get:
+      tags: [Authentication]
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: user profile objects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /auth/forgot-password:
+    post:
+      tags: [Authentication]
+      summary: Forgot password
+      description: Initiate password reset for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+            example:
+              email: user@example.com
+      responses:
+        "200":
+          description: Reset initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Password reset email sent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /role:
+    get:
+      tags: [Roles]
+      summary: List roles
+      description: Get all role definitions
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoleData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Roles]
+      summary: Create role
+      description: Create a new role
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleDTO"
+            example:
+              role: instructor
+              name: Instructor
+      responses:
+        "201":
+          description: Created role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /role/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Roles]
+      summary: Get role
+      description: Retrieve a single role by ID
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Roles]
+      summary: Update role
+      description: Update role fields
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleUpdateDTO"
+            example:
+              name: Senior Instructor
+      responses:
+        "202":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Roles]
+      summary: Delete role
+      description: Remove a role
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /user:
+    get:
+      tags: [Users]
+      summary: List users
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of user objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Users]
+      summary: Create user
+      description: Register a new user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDTO"
+            example:
+              email: alice@example.com
+              password: P@ssw0rd!
+              username: alice
+              fullName: Alice Roberts
+              designation: Lecturer
+              role: instructor
+              title: Dr.
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /user/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Users]
+      summary: Get user by ID
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Users]
+      summary: Update user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateDTO"
+            example:
+              fullName: Alice R.
+              title: Prof.
+      responses:
+        "202":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Users]
+      summary: Delete user
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /student:
+    get:
+      tags: [Students]
+      summary: List students
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Students]
+      summary: Create student record
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentCreateDTO"
+            example:
+              userId: user-123
+              enrolmentDate: 2023-08-15
+              status: active
+              session: 2023-2024
+              graduationYear: 2026
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /student/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Students]
+      summary: Get student
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Student record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Students]
+      summary: Update student
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentUpdateDTO"
+            example:
+              status: graduated
+      responses:
+        "202":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Students]
+      summary: Delete user
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /teacher:
+    get:
+      tags: [Teachers]
+      summary: List teachers
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of teachers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Teacher"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Teachers]
+      summary: Create teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/UserDTO"
+                - $ref: "#/components/schemas/TeacherCreateDTO"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Teacher"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /teacher/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Teachers]
+      summary: Get single teacher
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Student record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Teacher"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Teachers]
+      summary: Update teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentUpdateDTO"
+            example:
+              status: graduated
+      responses:
+        "202":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Teachers]
+      summary: Delete teacher
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /semester:
+    get:
+      tags: [Semesters]
+      summary: List semesters
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of semesters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Semester"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Semesters]
+      summary: Create semester
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SemesterCreateDTO"
+            example:
+              name: Fall-2023
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Semester"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /semester/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      tags: [Semesters]
+      summary: Get single semester
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Student record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Semester"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Semesters]
+      summary: Update semester
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseCreateDTO"
+            example:
+              status: graduated
+      responses:
+        "202":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Semesters]
+      summary: Delete semester
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /course:
+    get:
+      tags: [Courses]
+      summary: List courses
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Courses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Courses]
+      summary: Create course
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseCreateDTO"
+            example:
+              semester: 1
+              code: CS101
+              name: Introduction to Computer Science
+              description: Basic concepts of computing
+              credits: 3
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Courses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /course/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Courses]
+      summary: Get course
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Courses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Courses]
+      summary: Update course
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseUpdateDTO"
+            example:
+              name: Intro to CS
+      responses:
+        "202":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Courses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Courses]
+      summary: Delete course
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /course/{courseId}/schedule:
+    parameters:
+      - name: courseId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [CourseSchedules]
+      summary: Get schedules for a course
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of schedules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseSchedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [CourseSchedules]
+      summary: Create course schedule
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseScheduleCreateDTO"
+            example:
+              courseId: course-1
+              dayOfWeek: Monday
+              startTime: "09:00:00"
+              endTime: "10:30:00"
+              room: A101
+              teacherId: teacher-1
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseSchedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /course/{courseId}/schedule/{id}:
+    parameters:
+      - name: courseId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [CourseSchedules]
+      summary: Get single schedules
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of schedules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseSchedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [CourseSchedules]
+      summary: Create course schedule
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseScheduleCreateDTO"
+            example:
+              courseId: course-1
+              dayOfWeek: Monday
+              startTime: "09:00:00"
+              endTime: "10:30:00"
+              room: A101
+              teacherId: teacher-1
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseSchedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [CourseSchedules]
+      summary: Create course schedule
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /attendance:
+    get:
+      tags: [Attendance]
+      summary: List attendance records
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: studentId
+          schema:
+            type: string
+          description: Filter by student id
+      responses:
+        "200":
+          description: Array of attendance records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttendanceRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Attendance]
+      summary: Create attendance record
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttendanceCreateDTO"
+            example:
+              studentId: student-123
+              date: 2024-10-10
+              status: present
+              checkInTime: "09:05:00"
+              checkOutTime: "11:00:00"
+              notes: Attended lecture
+              courseId: course-1
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /attendance/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Attendance]
+      summary: Get attendance
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Attendance record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Attendance]
+      summary: Update attendance
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttendanceUpdateDTO"
+            example:
+              status: absent
+              notes: Sick
+      responses:
+        "202":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Attendance]
+      summary: Delete attendance
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /activity:
+    get:
+      tags: [Activities]
+      summary: List activities
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Activity"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Activities]
+      summary: Create activity
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivityCreateDTO"
+            example:
+              activityType: meeting
+              description: Curriculum planning
+              relatedEntityType: course
+              relatedEntityId: course-1
+              lead: user-123
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Activity"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /activity/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      tags: [Activities]
+      summary: Get single activity
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: activity record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Activity"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Activities]
+      summary: Update activity
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivityCreateDTO"
+            example:
+              status: absent
+              notes: Sick
+      responses:
+        "202":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Activity"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Activities]
+      summary: Delete activity
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /notice:
+    get:
+      tags: [Notices]
+      summary: List notices
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of notices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notice"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Notices]
+      summary: Create notice
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoticeCreateDTO"
+            example:
+              createdBy: user-1
+              text: Classes will be held online tomorrow
+              attachment: null
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notice"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /notice/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      tags: [Notices]
+      summary: Get single notice
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: notice record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notice"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Notices]
+      summary: Update notice
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoticeCreateDTO"
+            example:
+              status: absent
+              notes: Sick
+      responses:
+        "202":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notice"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Notices]
+      summary: Delete notice
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /report:
+    get:
+      tags: [Reports]
+      summary: List reports
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Reports]
+      summary: Generate report
+      description: Request generation of a report
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportCreateDTO"
+            example:
+              title: Attendance Report
+              description: Attendance summary for CS101
+              type: attendance
+              parameters: '{"courseId":"course-1","from":"2024-01-01","to":"2024-06-30"}'
+              generatedBy: user-1
+      responses:
+        "201":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    # Auth Schemas
+    AuthLoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    AuthTokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    # Roles
+    RoleData:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+        name:
+          type: string
+      required: [id, role]
+    RoleDTO:
+      type: object
+      properties:
+        role:
+          type: string
+        name:
+          type: string
+      required: [role]
+    RoleUpdateDTO:
+      type: object
+      properties:
+        role:
+          type: string
+        name:
+          type: string
+    # Users
+    UserData:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        fullName:
+          type: string
+        password:
+          type: string
+          description: hashed password (not returned in real APIs)
+        role:
+          type: string
+        title:
+          type: string
+        designation:
+          type: string
+      required: [id, email, username]
+    UserDTO:
+      type: object
+      required: [email, password, username]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        username:
+          type: string
+        fullName:
+          type: string
+        designation:
+          type: string
+        role:
+          type: string
+        title:
+          type: string
+    UserUpdateDTO:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        fullName:
+          type: string
+        designation:
+          type: string
+        role:
+          type: string
+        title:
+          type: string
+    # Student
+    Student:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        enrolmentDate:
+          type: string
+          format: date
+        status:
+          type: string
+        session:
+          type: string
+        graduationYear:
+          type: integer
+        currentSemester:
+          type: integer
+      required: [id, userId]
+    StudentCreateDTO:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          type: string
+        enrolmentDate:
+          type: string
+          format: date
+        status:
+          type: string
+        session:
+          type: string
+        graduationYear:
+          type: integer
+        currentSemester:
+          type: integer
+    StudentUpdateDTO:
+      type: object
+      properties:
+        enrolmentDate:
+          type: string
+          format: date
+        status:
+          type: string
+        session:
+          type: string
+        graduationYear:
+          type: integer
+        currentSemester:
+          type: integer
+    # Teacher
+    Teacher:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        designation:
+          type: string
+        joinDate:
+          type: string
+          format: date
+        officeLocation:
+          type: string
+      required: [id, userId]
+    TeacherCreateDTO:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          type: string
+        designation:
+          type: string
+        joinDate:
+          type: string
+          format: date
+        officeLocation:
+          type: string
+    TeacherUpdateDTO:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          type: string
+        designation:
+          type: string
+        joinDate:
+          type: string
+          format: date
+        officeLocation:
+          type: string
+    # Semester
+    Semester:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required: [id, name]
+    SemesterCreateDTO:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+    # Courses
+    Courses:
+      type: object
+      properties:
+        id:
+          type: string
+        semester:
+          type: integer
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        credits:
+          type: integer
+      required: [id, code, name]
+    CourseCreateDTO:
+      type: object
+      required: [code, name]
+      properties:
+        semester:
+          type: integer
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        credits:
+          type: integer
+    CourseUpdateDTO:
+      type: object
+      properties:
+        semester:
+          type: integer
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        credits:
+          type: integer
+    # Course Schedule
+    CourseSchedule:
+      type: object
+      properties:
+        id:
+          type: string
+        courseId:
+          type: string
+        dayOfWeek:
+          type: string
+        startTime:
+          type: string
+          description: time in HH:MM:SS
+        endTime:
+          type: string
+          description: time in HH:MM:SS
+        room:
+          type: string
+        teacherId:
+          type: string
+      required: [id, courseId, dayOfWeek]
+    CourseScheduleCreateDTO:
+      type: object
+      required: [courseId, dayOfWeek, startTime, endTime]
+      properties:
+        courseId:
+          type: string
+        dayOfWeek:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        room:
+          type: string
+        teacherId:
+          type: string
+    # Attendance
+    AttendanceRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        studentId:
+          type: string
+        date:
+          type: string
+          format: date
+        status:
+          type: string
+        checkInTime:
+          type: string
+        checkOutTime:
+          type: string
+        notes:
+          type: string
+        courseId:
+          type: string
+        recordedBy:
+          type: string
+      required: [id, studentId, date]
+    AttendanceCreateDTO:
+      type: object
+      required: [studentId, date, status]
+      properties:
+        studentId:
+          type: string
+        date:
+          type: string
+          format: date
+        status:
+          type: string
+        checkInTime:
+          type: string
+        checkOutTime:
+          type: string
+        notes:
+          type: string
+        courseId:
+          type: string
+        recordedBy:
+          type: string
+    AttendanceUpdateDTO:
+      type: object
+      properties:
+        status:
+          type: string
+        checkInTime:
+          type: string
+        checkOutTime:
+          type: string
+        notes:
+          type: string
+    # Activities
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+        activityType:
+          type: string
+        description:
+          type: string
+        relatedEntityType:
+          type: string
+        relatedEntityId:
+          type: string
+        lead:
+          type: string
+      required: [id, activityType]
+    ActivityCreateDTO:
+      type: object
+      required: [activityType]
+      properties:
+        activityType:
+          type: string
+        description:
+          type: string
+        relatedEntityType:
+          type: string
+        relatedEntityId:
+          type: string
+        lead:
+          type: string
+    # Notices
+    Notice:
+      type: object
+      properties:
+        id:
+          type: string
+        createdBy:
+          type: string
+        text:
+          type: string
+        attachment:
+          type: string
+          nullable: true
+      required: [id, createdBy, text]
+    NoticeCreateDTO:
+      type: object
+      required: [createdBy, text]
+      properties:
+        createdBy:
+          type: string
+        text:
+          type: string
+        attachment:
+          type: string
+          nullable: true
+    # Reports
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        generatedAt:
+          type: string
+          format: date-time
+        filePath:
+          type: string
+        parameters:
+          type: string
+        generatedBy:
+          type: string
+      required: [id, title, type]
+    ReportCreateDTO:
+      type: object
+      required: [title, type]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        parameters:
+          type: string
+        generatedBy:
+          type: string
+  examples: {}
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          example:
+            error:
+              code: 400
+              message: Bad Request
+              details: The provided input parameters are invalid.
+              fields:
+                - field: field1
+                  message: field1 cannot be empty.
+                - field: field2
+                  message: field2 must be at least 8 characters long.
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          example:
+            error:
+              code: 401
+              message: Unauthorized
+              details: Authentication credentials are missing or invalid.
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          example:
+            error:
+              code: 403
+              message: Forbidden
+              details: You do not have permission to access this resource.
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          example:
+            error:
+              code: 404
+              message: Not found
+              details: Your request resources are not found
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          example:
+            error:
+              code: 404
+              message: Internal Server Error
+              details: Something went wrong! try again later!

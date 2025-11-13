@@ -4,6 +4,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -28,6 +31,12 @@ async function bootstrap() {
       },
     }),
   );
+
+  // swagger
+  const files = fs.readFileSync('src/swagger/swagger.yaml', 'utf8');
+  const document: OpenAPIObject = yaml.load(files) as OpenAPIObject;
+
+  SwaggerModule.setup('docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }
