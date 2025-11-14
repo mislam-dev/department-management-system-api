@@ -2,6 +2,9 @@ import { Controller, Get, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { AppService } from './app.service';
+import { Public } from './auth/decorators/public.decorator';
+import { SetRolePermissions } from './auth/decorators/set-roles-permissions.decorator';
+import { SetRoles } from './auth/decorators/set-roles.decorator';
 
 @Controller()
 export class AppController {
@@ -10,17 +13,21 @@ export class AppController {
     private readonly config: ConfigService,
   ) {}
 
+  @SetRoles('admin')
+  @SetRolePermissions(['admin'], ['read:users'])
   @Get()
   getHello(): string {
     return this.appService.getHello();
   }
 
   // todo remove on production
+  @Public()
   @Get('login')
   login(@Res() res) {
     const domain = this.config.get<string>('auth0.domain');
     const clientId = this.config.get<string>('auth0.clientId');
     const callbackUrl = this.config.get<string>('auth0.callbackUrl');
+    const audience = this.config.get<string>('auth0.audience');
 
     return res.redirect(
       `https://${domain}/authorize?` +
@@ -28,11 +35,13 @@ export class AppController {
         `client_id=${clientId}&` +
         `redirect_uri=${callbackUrl}&` +
         `scope=openid%20profile%20email&` +
+        `audience=${audience}&` +
         `code_challenge_method=none`,
     );
   }
 
   // todo remove in production
+  @Public()
   @Get('auth/callback')
   async callback(@Req() req, @Res() res) {
     const code: string = req.query.code || '';
