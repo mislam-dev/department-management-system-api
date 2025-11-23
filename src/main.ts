@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
+import { useContainer } from 'class-validator';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import { AppModule } from './app.module';
@@ -37,6 +38,8 @@ async function bootstrap() {
   const document: OpenAPIObject = yaml.load(files) as OpenAPIObject;
 
   SwaggerModule.setup('docs', app, document);
+
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   await app.listen(process.env.PORT ?? 3000);
 }
