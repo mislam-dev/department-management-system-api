@@ -39,6 +39,7 @@ export class Auth0Service {
   ) {
     const res = await this.auth0.users.create({
       connection: this.connection,
+      verify_email: true,
       ...data,
     });
 
