@@ -31,10 +31,6 @@ export class User {
   @IsEmail()
   email: string;
 
-  @Column({ nullable: true, default: null })
-  @IsString()
-  username: string;
-
   @Column({ unique: true })
   auth0_user_id: string;
 

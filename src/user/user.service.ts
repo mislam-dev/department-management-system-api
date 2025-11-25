@@ -12,12 +12,11 @@ export class UserService {
     private readonly auth0: Auth0Service,
   ) {}
   async create(createUserDto: CreateUserDto) {
-    const { email, designation, fullName, username, password } = createUserDto;
+    const { email, designation, fullName, password } = createUserDto;
     const { user_id } = await this.auth0.createUser({
       name: fullName,
       password,
       email,
-      username,
     });
 
     const user = this.repository.create({
@@ -25,7 +24,6 @@ export class UserService {
       designation,
       email,
       auth0_user_id: user_id,
-      username,
     });
     return await this.repository.save(user);
   }
@@ -39,6 +37,16 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found!');
     return user;
   }
+
+  async findOneByAuth0Id(id: string) {
+    const user = await this.repository.findOne({
+      where: { auth0_user_id: id },
+    });
+
+    if (!user) throw new NotFoundException('User not found!');
+    return user;
+  }
+
   async findByEmail(email: string) {
     const user = await this.repository.findOne({ where: { email } });
     if (!user) throw new NotFoundException('User not found!');

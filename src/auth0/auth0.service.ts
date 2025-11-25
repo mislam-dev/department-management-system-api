@@ -58,4 +58,7 @@ export class Auth0Service {
   async deleteUser(id: string) {
     return await this.auth0.users.delete(id);
   }
+  async getAllRoles() {
+    return await this.auth0.roles.list();
+  }
 }

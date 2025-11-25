@@ -10,5 +10,6 @@ import { UniqueEmailConstraints } from './validators/is-unique-email.validator';
   controllers: [UserController],
   providers: [UserService, Auth0Service, UniqueEmailConstraints],
   imports: [TypeOrmModule.forFeature([User])],
+  exports: [UserService],
 })
 export class UserModule {}

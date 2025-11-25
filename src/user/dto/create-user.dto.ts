@@ -15,10 +15,6 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  username: string;
-
-  @IsString()
-  @IsNotEmpty()
   fullName: string;
 
   @IsEnum(Designation)
