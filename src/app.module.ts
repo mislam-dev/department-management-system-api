@@ -14,6 +14,7 @@ import { auth0_m2m } from './config/auth0-m2m.config';
 import auth0Config from './config/auth0.config';
 import { databaseConfig } from './config/database.config';
 import { UserModule } from './user/user.module';
+import { SemesterModule } from './semester/semester.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     UserModule,
     Auth0Module,
+    SemesterModule,
   ],
   controllers: [AppController],
   providers: [
