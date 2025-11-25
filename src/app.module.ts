@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -13,11 +15,15 @@ import { Auth0Module } from './auth0/auth0.module';
 import { auth0_m2m } from './config/auth0-m2m.config';
 import auth0Config from './config/auth0.config';
 import { databaseConfig } from './config/database.config';
-import { UserModule } from './user/user.module';
 import { SemesterModule } from './semester/semester.module';
+import { TeacherModule } from './teacher/teacher.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [auth0Config, databaseConfig, auth0_m2m],
@@ -39,6 +45,7 @@ import { SemesterModule } from './semester/semester.module';
     UserModule,
     Auth0Module,
     SemesterModule,
+    TeacherModule,
   ],
   controllers: [AppController],
   providers: [

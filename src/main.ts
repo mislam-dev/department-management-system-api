@@ -37,7 +37,9 @@ async function bootstrap() {
   const files = fs.readFileSync('src/swagger/swagger.yaml', 'utf8');
   const document: OpenAPIObject = yaml.load(files) as OpenAPIObject;
 
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    customCssUrl: '/swagger-dark.css',
+  });
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
