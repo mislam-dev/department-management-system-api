@@ -21,6 +21,7 @@ import { UserModule } from './user/user.module';
 import { StudentModule } from './student/student.module';
 import { CourseModule } from './course/course.module';
 import { CourseScheduleModule } from './course_schedule/course_schedule.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { CourseScheduleModule } from './course_schedule/course_schedule.module';
     StudentModule,
     CourseModule,
     CourseScheduleModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [
