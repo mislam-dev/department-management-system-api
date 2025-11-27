@@ -20,6 +20,7 @@ import { TeacherModule } from './teacher/teacher.module';
 import { UserModule } from './user/user.module';
 import { StudentModule } from './student/student.module';
 import { CourseModule } from './course/course.module';
+import { CourseScheduleModule } from './course_schedule/course_schedule.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CourseModule } from './course/course.module';
     TeacherModule,
     StudentModule,
     CourseModule,
+    CourseScheduleModule,
   ],
   controllers: [AppController],
   providers: [

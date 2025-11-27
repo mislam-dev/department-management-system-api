@@ -8,7 +8,7 @@ import {
 
 export class CreateCourseDto {
   @IsUUID()
-  semester: string;
+  semesterId: string;
 
   @IsString()
   @MinLength(3)
