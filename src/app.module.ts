@@ -18,6 +18,7 @@ import { databaseConfig } from './config/database.config';
 import { SemesterModule } from './semester/semester.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { UserModule } from './user/user.module';
+import { StudentModule } from './student/student.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { UserModule } from './user/user.module';
     Auth0Module,
     SemesterModule,
     TeacherModule,
+    StudentModule,
   ],
   controllers: [AppController],
   providers: [
