@@ -19,6 +19,7 @@ import { SemesterModule } from './semester/semester.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { UserModule } from './user/user.module';
 import { StudentModule } from './student/student.module';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { StudentModule } from './student/student.module';
     SemesterModule,
     TeacherModule,
     StudentModule,
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [
