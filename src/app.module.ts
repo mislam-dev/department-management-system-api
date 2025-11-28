@@ -24,6 +24,7 @@ import { CourseScheduleModule } from './course_schedule/course_schedule.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { ActivityModule } from './activity/activity.module';
 import { NoticeModule } from './notice/notice.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { NoticeModule } from './notice/notice.module';
     AttendanceModule,
     ActivityModule,
     NoticeModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [
