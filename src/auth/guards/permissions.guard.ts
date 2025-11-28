@@ -32,6 +32,7 @@ export class PermissionsGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest();
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const userPermissions: string[] = user?.permissions || [];
 
     const hasAccess = requiredPermissions.every((p) =>
