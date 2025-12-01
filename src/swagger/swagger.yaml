@@ -1410,6 +1410,10 @@ components:
           type: string
         designation:
           $ref: '#/components/schemas/DesignationEnum'
+        created_at:
+          type: string
+        updatedAt:
+          type: string
       required: [id, email, username]
     UserDTO:
       type: object
