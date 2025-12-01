@@ -115,9 +115,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserData'
+                type: object
+                properties:
+                  total:
+                    type: string
+                  limit:
+                    type: string
+                  offset:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserData'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -141,11 +150,9 @@ paths:
             example:
               email: alice@example.com
               password: P@ssw0rd!
-              username: alice
               fullName: Alice Roberts
-              designation: Lecturer
-              role: instructor
-              title: Dr.
+              designation: student
+              role: ''
       responses:
         '201':
           description: User created
@@ -1337,6 +1344,13 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    DesignationEnum:
+      type: string
+      enum:
+        - ADMIN
+        - MANAGER
+        - EMPLOYEE
+        - INTERN
     # Auth Schemas
     AuthLoginRequest:
       type: object
@@ -1388,23 +1402,18 @@ components:
         email:
           type: string
           format: email
-        username:
-          type: string
         fullName:
           type: string
-        password:
+        auth0_role:
           type: string
-          description: hashed password (not returned in real APIs)
-        role:
-          type: string
-        title:
+        auth0_user_id:
           type: string
         designation:
-          type: string
+          $ref: '#/components/schemas/DesignationEnum'
       required: [id, email, username]
     UserDTO:
       type: object
-      required: [email, password, username]
+      required: [email, password, designation, fullName]
       properties:
         email:
           type: string
@@ -1416,27 +1425,11 @@ components:
         fullName:
           type: string
         designation:
-          type: string
+          $ref: '#/components/schemas/DesignationEnum'
         role:
-          type: string
-        title:
           type: string
     UserUpdateDTO:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        username:
-          type: string
-        fullName:
-          type: string
-        designation:
-          type: string
-        role:
-          type: string
-        title:
-          type: string
+      $ref: '#/components/schemas/UserDTO'
     # Student
     Student:
       type: object
