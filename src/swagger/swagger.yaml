@@ -106,6 +106,9 @@ paths:
       summary: List users
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
       responses:
         '200':
           description: Array of user objects
@@ -1778,48 +1781,67 @@ components:
       content:
         application/json:
           example:
-            error:
-              code: 400
-              message: Bad Request
-              details: The provided input parameters are invalid.
-              fields:
-                - field: field1
-                  message: field1 cannot be empty.
-                - field: field2
-                  message: field2 must be at least 8 characters long.
+            code: 400
+            message: Bad Request
+            fields:
+              - field: field1
+                values:
+                  - field1 cannot be empty.
+                  - field1 cannot be empty.
+
+              - field: field2
+                values:
+                  - field2 must be at least 8 characters long.
+                  - field2 must be at least 8 characters long.
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           example:
-            error:
-              code: 401
-              message: Unauthorized
-              details: Authentication credentials are missing or invalid.
+            code: 401
+            statusCode: Unauthorized
+
     Forbidden:
       description: Forbidden
       content:
         application/json:
           example:
-            error:
-              code: 403
-              message: Forbidden
-              details: You do not have permission to access this resource.
+            statusCode: 403
+            message: Forbidden resource
+            error: Forbidden
     NotFound:
       description: Not Found
       content:
         application/json:
           example:
-            error:
-              code: 404
-              message: Not found
-              details: Your request resources are not found
+            statusCode: 404
+            message: 'Not found!'
+            error: 'Not found!'
     InternalServerError:
       description: Internal Server Error
       content:
         application/json:
           example:
-            error:
-              code: 404
-              message: Internal Server Error
-              details: Something went wrong! try again later!
+            statusCode: 404
+            message: 'Internal Server Error'
+            error: 'Internal Server Error'
+  parameters:
+    LimitParam:
+      name: limit
+      in: query
+      description: Number of items to return
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 10
+
+    OffsetParam:
+      name: offset
+      in: query
+      description: Number of items to skip
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0

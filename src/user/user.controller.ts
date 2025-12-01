@@ -6,9 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { SetPermissions } from 'src/auth/decorators/set-permissions.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PaginationDto } from './dto/pagination.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
@@ -24,8 +26,11 @@ export class UserController {
 
   @SetPermissions('users:read')
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() pagination: PaginationDto) {
+    return this.userService.findAll({
+      limit: pagination.limit || 10,
+      offset: pagination.offset || 0,
+    });
   }
   @SetPermissions('users:read')
   @Get(':id')

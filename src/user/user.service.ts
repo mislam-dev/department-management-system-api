@@ -28,8 +28,19 @@ export class UserService {
     return await this.repository.save(user);
   }
 
-  findAll() {
-    return this.repository.find();
+  async findAll({ limit, offset }: { limit: number; offset: number }) {
+    const [results, total] = await this.repository.findAndCount({
+      skip: offset,
+      take: limit,
+      order: { createdAt: 'desc' },
+    });
+
+    return {
+      total,
+      limit,
+      offset,
+      results,
+    };
   }
 
   async findOne(id: string) {
