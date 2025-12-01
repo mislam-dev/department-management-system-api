@@ -39,6 +39,11 @@ export class TeacherService {
     if (!teacher) throw new NotFoundException('Teacher data not found');
     return teacher;
   }
+  async findOneByUserId(userId: string) {
+    const teacher = await this.repo.findOne({ where: { userId } });
+    if (!teacher) throw new NotFoundException('Teacher data not found');
+    return teacher;
+  }
 
   async update(id: string, updateTeacherDto: UpdateTeacherDto) {
     const teacher = await this.findOne(id);

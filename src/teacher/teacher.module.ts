@@ -10,5 +10,6 @@ import { UniqueUserConstraints } from './validators/is-unique-user-id.validator'
   controllers: [TeacherController],
   providers: [TeacherService, UniqueUserConstraints],
   imports: [TypeOrmModule.forFeature([Teacher]), UserModule],
+  exports: [TeacherService],
 })
 export class TeacherModule {}

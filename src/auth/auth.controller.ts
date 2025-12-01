@@ -1,7 +1,7 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
-import { SetRolePermissions } from './decorators/set-roles-permissions.decorator';
+import { SetRoles } from './decorators/set-roles.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -9,7 +9,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
-  @SetRolePermissions(['admin'], [])
+  @SetRoles('admin')
   @Get('roles')
   usersRoles() {
     return this.authService.roles();
@@ -18,15 +18,16 @@ export class AuthController {
   @Get('me')
   me(@Req() req: Request) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const user: { sub: string } = (req as any).user ?? {};
-    return this.userService.findOneByAuth0Id(user.sub);
+    const user = (req as any).user ?? {};
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return user;
   }
 
   @Get('profile')
   async profile(@Req() req: Request) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const user: { sub: string } = (req as any).user ?? {};
-    const dbUser = await this.userService.findOneByAuth0Id(user.sub);
-    return this.authService.profile(dbUser.id);
+
+    return this.authService.profile(user.sub);
   }
 }

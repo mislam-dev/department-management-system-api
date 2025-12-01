@@ -61,4 +61,7 @@ export class Auth0Service {
   async getAllRoles() {
     return await this.auth0.roles.list();
   }
+  async getRoleById(id: string) {
+    return await this.auth0.roles.get(id);
+  }
 }

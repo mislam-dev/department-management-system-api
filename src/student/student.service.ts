@@ -49,6 +49,11 @@ export class StudentService {
     if (!student) throw new NotFoundException('Student not found!');
     return student;
   }
+  async findOneByUserId(userId: string) {
+    const student = await this.repo.findOne({ where: { userId } });
+    if (!student) throw new NotFoundException('Student not found!');
+    return student;
+  }
 
   async update(id: string, updateStudentDto: UpdateStudentDto) {
     const student = await this.findOne(id);
