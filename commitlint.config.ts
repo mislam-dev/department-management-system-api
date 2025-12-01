@@ -29,6 +29,7 @@ module.exports = {
       2,
       'always',
       [
+        'users',
         'student',
         'course',
         'course-schedule',
