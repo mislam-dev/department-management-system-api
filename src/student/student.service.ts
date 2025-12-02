@@ -6,6 +6,11 @@ import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { Student } from './entities/student.entity';
 
+export type PaginationOptions = {
+  limit: number;
+  offset: number;
+};
+
 @Injectable()
 export class StudentService {
   constructor(
@@ -40,8 +45,18 @@ export class StudentService {
     return this.repo.save(student);
   }
 
-  findAll() {
-    return this.repo.find();
+  async findAll({ limit, offset }: PaginationOptions) {
+    const [students, total] = await this.repo.findAndCount({
+      skip: offset,
+      take: limit,
+    });
+
+    return {
+      total,
+      limit,
+      offset,
+      results: students,
+    };
   }
 
   async findOne(id: string) {

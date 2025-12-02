@@ -6,8 +6,10 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
+import { PaginationDto } from './dto/pagination.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentService } from './student.service';
 
@@ -21,8 +23,11 @@ export class StudentController {
   }
 
   @Get()
-  findAll() {
-    return this.studentService.findAll();
+  findAll(@Query() pagination: PaginationDto) {
+    return this.studentService.findAll({
+      limit: pagination.limit || 10,
+      offset: pagination.offset || 0,
+    });
   }
 
   @Get(':id')

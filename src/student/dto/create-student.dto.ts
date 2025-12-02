@@ -8,6 +8,7 @@ import {
   IsUUID,
 } from 'class-validator';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { IsValidSemesterId } from '../decorator/is-valid-semester-id.decorator';
 import { StudentStatus } from '../entities/student.entity';
 
 export class CreateStudentDto extends PickType(CreateUserDto, [
@@ -30,5 +31,6 @@ export class CreateStudentDto extends PickType(CreateUserDto, [
   graduationYear?: number;
 
   @IsUUID(undefined, { message: 'Current Semester Id must be valid!' })
+  @IsValidSemesterId()
   currentSemesterId: string;
 }

@@ -8,5 +8,6 @@ import { SemesterService } from './semester.service';
   controllers: [SemesterController],
   providers: [SemesterService],
   imports: [TypeOrmModule.forFeature([Semester])],
+  exports: [SemesterService],
 })
 export class SemesterModule {}
