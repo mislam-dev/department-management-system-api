@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationOptions } from 'src/pagination/pagination.types';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
@@ -30,8 +31,17 @@ export class TeacherService {
     return this.repo.save(teacher);
   }
 
-  findAll() {
-    return this.repo.find();
+  async findAll({ limit, offset }: PaginationOptions) {
+    const [results, total] = await this.repo.findAndCount({
+      take: limit,
+      skip: offset,
+    });
+    return {
+      total,
+      limit,
+      offset,
+      results,
+    };
   }
 
   async findOne(id: string) {

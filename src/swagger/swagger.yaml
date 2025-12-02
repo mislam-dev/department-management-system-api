@@ -400,15 +400,30 @@ paths:
       summary: List teachers
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
       responses:
         '200':
           description: Array of teachers
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Teacher'
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  limit:
+                    type: number
+                    default: 10
+                  offset:
+                    type: number
+                    default: 0
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Teacher'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -427,9 +442,7 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/UserDTO'
-                - $ref: '#/components/schemas/TeacherCreateDTO'
+              $ref: '#/components/schemas/TeacherCreateDTO'
       responses:
         '201':
           description: Created
@@ -483,7 +496,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StudentUpdateDTO'
+              $ref: '#/components/schemas/TeacherUpdateDTO'
             example:
               status: graduated
       responses:
@@ -1610,42 +1623,68 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         userId:
           type: string
+          format: uuid
         designation:
-          type: string
+          allOf:
+            - $ref: '#/components/schemas/DesignationEnum'
+            - default: 'junior_instructor'
         joinDate:
           type: string
           format: date
         officeLocation:
           type: string
+          default: COM-201
       required: [id, userId]
     TeacherCreateDTO:
       type: object
-      required: [userId]
+      required:
+        - email
+        - fullName
+        - password
+        - designation
+        - joinDate
+        - officeLocation
       properties:
-        userId:
+        email:
           type: string
+          format: email
+          default: John.doe.1@gmail.com
+        fullName:
+          type: string
+          default: John Doe
+        password:
+          type: string
+          minLength: 6
+          default: P@ssw0rd!
         designation:
-          type: string
+          allOf:
+            - $ref: '#/components/schemas/DesignationEnum'
+            - default: junior_instructor
         joinDate:
           type: string
           format: date
         officeLocation:
           type: string
+          default: COM-201
     TeacherUpdateDTO:
       type: object
-      required: [userId]
       properties:
-        userId:
+        fullName:
           type: string
+          default: John Doe
         designation:
-          type: string
+          allOf:
+            - $ref: '#/components/schemas/DesignationEnum'
+            - default: junior_instructor
         joinDate:
           type: string
           format: date
         officeLocation:
           type: string
+          default: COM-201
     # Semester
     Semester:
       type: object
