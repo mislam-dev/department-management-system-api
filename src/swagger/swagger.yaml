@@ -50,7 +50,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserData'
+                $ref: '#/components/schemas/MeResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1344,6 +1344,46 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    MeResponse:
+      type: object
+      properties:
+        app_name/roles:
+          type: array
+          items:
+            type: string
+          description: Custom claim containing assigned roles.
+        iss:
+          type: string
+          description: Issuer identifier for the JWT.
+          example: https://domain.com/
+        sub:
+          type: string
+          description: Unique subject (user) identifier.
+          example: auth0|6915a0beed*******
+        aud:
+          type: array
+          items:
+            type: string
+          description: Audience values for which this token is intended.
+        iat:
+          type: integer
+          format: int64
+          description: Issued-at timestamp (Unix).
+        exp:
+          type: integer
+          format: int64
+          description: Expiration timestamp (Unix).
+        scope:
+          type: string
+          description: OAuth scopes included in the token.
+        azp:
+          type: string
+          description: Authorized party (client ID).
+        permissions:
+          type: array
+          description: Permissions assigned to the user.
+          items:
+            type: string
     DesignationEnum:
       type: string
       enum:
