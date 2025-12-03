@@ -21,5 +21,6 @@ import { IsValidTimeRangeConstraint } from './validators/is-valid-time-range.val
     IsValidTimeRangeConstraint,
   ],
   imports: [TypeOrmModule.forFeature([CourseSchedule]), CourseModule],
+  exports: [CourseScheduleService],
 })
 export class CourseScheduleModule {}

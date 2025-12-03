@@ -7,11 +7,14 @@ import {
   Matches,
 } from 'class-validator';
 import { IsUniqueAttendance } from '../decorators/is-unique-attendance.decorator';
+import { IsValidCourseScheduleId } from '../decorators/is-valid-course-schedule-id.decorator';
+import { IsValidStudentId } from '../decorators/is-valid-student-id.decorator';
 import { AttendanceStatus } from '../entities/attendance.entity';
 
 export class CreateAttendanceDto {
-  @IsUniqueAttendance()
   @IsUUID(undefined, { message: 'Student ID must be a valid UUID' })
+  @IsValidStudentId()
+  @IsUniqueAttendance()
   studentId: string;
 
   @IsDateString(
@@ -41,8 +44,6 @@ export class CreateAttendanceDto {
   notes?: string;
 
   @IsUUID(undefined, { message: 'Course ID must be a valid UUID' })
+  @IsValidCourseScheduleId()
   courseScheduleId: string;
-
-  @IsUUID(undefined, { message: 'RecordedBy must be a valid UUID' })
-  recordedBy: string;
 }

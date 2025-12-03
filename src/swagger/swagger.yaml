@@ -958,15 +958,30 @@ paths:
           schema:
             type: string
           description: Filter by student id
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+
       responses:
         '200':
           description: Array of attendance records
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AttendanceRecord'
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  limit:
+                    type: number
+                    default: 10
+                  offset:
+                    type: number
+                    default: 0
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AttendanceRecord'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -986,14 +1001,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AttendanceCreateDTO'
-            example:
-              studentId: student-123
-              date: 2024-10-10
-              status: present
-              checkInTime: '09:05:00'
-              checkOutTime: '11:00:00'
-              notes: Attended lecture
-              courseId: course-1
       responses:
         '201':
           description: Created
@@ -1048,9 +1055,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AttendanceUpdateDTO'
-            example:
-              status: absent
-              notes: Sick
       responses:
         '202':
           description: Updated
@@ -1865,56 +1869,71 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         studentId:
           type: string
+          format: uuid
         date:
           type: string
           format: date
         status:
           type: string
+          default: PRESENT
         checkInTime:
           type: string
+          default: 10:00
         checkOutTime:
           type: string
+          default: 10:30
         notes:
           type: string
+          default: Note goes here
         courseId:
           type: string
+          format: uuid
         recordedBy:
           type: string
-      required: [id, studentId, date]
+          format: uuid
     AttendanceCreateDTO:
       type: object
-      required: [studentId, date, status]
+      required: [studentId, date, courseId]
       properties:
         studentId:
           type: string
+          format: uuid
         date:
           type: string
           format: date
         status:
           type: string
+          default: PRESENT
         checkInTime:
           type: string
+          default: 10:00
         checkOutTime:
           type: string
+          default: 10:30
         notes:
           type: string
-        courseId:
+          default: Everything good
+        courseScheduleId:
           type: string
-        recordedBy:
-          type: string
+          format: uuid
     AttendanceUpdateDTO:
       type: object
       properties:
         status:
           type: string
+          default: PRESENT
         checkInTime:
           type: string
+          default: 10:00
         checkOutTime:
           type: string
+          default: 10:30
         notes:
           type: string
+          default: Everything good
     # Activities
     Activity:
       type: object

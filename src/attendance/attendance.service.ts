@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationOptions } from 'src/student/student.service';
 import { Repository } from 'typeorm';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
@@ -16,8 +17,22 @@ export class AttendanceService {
     return this.repo.save(courseSchedule);
   }
 
-  findAll() {
-    return this.repo.find();
+  async findAll(paginationOption: PaginationOptions, studentId: string) {
+    const { limit, offset } = paginationOption;
+    const [results, total] = await this.repo.findAndCount({
+      skip: offset,
+      take: limit,
+      where: {
+        studentId,
+      },
+    });
+
+    return {
+      total,
+      limit,
+      offset,
+      results,
+    };
   }
 
   async findOne(id: string) {
