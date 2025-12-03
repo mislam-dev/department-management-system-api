@@ -1228,15 +1228,30 @@ paths:
       summary: List notices
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
       responses:
         '200':
           description: Array of notices
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Notice'
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  limit:
+                    type: number
+                    default: 10
+                  offset:
+                    type: number
+                    default: 0
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notice'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1256,10 +1271,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NoticeCreateDTO'
-            example:
-              createdBy: user-1
-              text: Classes will be held online tomorrow
-              attachment: null
       responses:
         '201':
           description: Created
@@ -1313,10 +1324,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoticeCreateDTO'
-            example:
-              status: absent
-              notes: Sick
+              $ref: '#/components/schemas/NoticeUpdateDTO'
       responses:
         '202':
           description: Updated
@@ -2014,20 +2022,31 @@ components:
       properties:
         id:
           type: string
-        createdBy:
+          format: uuid
+        createdById:
           type: string
+          format: uuid
         text:
           type: string
+          default: Back to class
         attachment:
           type: string
+          default: https://images.pexels.com/photos/32802440/pexels-photo-32802440.jpeg
           nullable: true
       required: [id, createdBy, text]
     NoticeCreateDTO:
       type: object
-      required: [createdBy, text]
+      required: [text]
       properties:
-        createdBy:
+        text:
           type: string
+          default: Back to class
+        attachment:
+          type: string
+          nullable: true
+    NoticeUpdateDTO:
+      type: object
+      properties:
         text:
           type: string
         attachment:

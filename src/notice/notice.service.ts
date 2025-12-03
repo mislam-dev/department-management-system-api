@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationOptions } from 'src/pagination/pagination.types';
 import { Repository } from 'typeorm';
 import { CreateNoticeDto } from './dto/create-notice.dto';
 import { UpdateNoticeDto } from './dto/update-notice.dto';
@@ -12,13 +13,24 @@ export class NoticeService {
     private readonly noticeRepo: Repository<Notice>,
   ) {}
 
-  async create(dto: CreateNoticeDto) {
+  async create(dto: CreateNoticeDto & { createdById: string }) {
     const notice = this.noticeRepo.create(dto);
     return this.noticeRepo.save(notice);
   }
 
-  async findAll(): Promise<Notice[]> {
-    return this.noticeRepo.find();
+  async findAll({ limit, offset }: PaginationOptions) {
+    const [results, total] = await this.noticeRepo.findAndCount({
+      skip: offset,
+      take: limit,
+      order: { createdAt: 'desc' },
+    });
+
+    return {
+      total,
+      limit,
+      offset,
+      results,
+    };
   }
 
   async findOne(id: string) {
@@ -35,7 +47,7 @@ export class NoticeService {
     return this.noticeRepo.save(notice);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string) {
     const notice = await this.findOne(id);
     await this.noticeRepo.remove(notice);
   }

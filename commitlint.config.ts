@@ -47,6 +47,7 @@ module.exports = {
         'notifications',
         'uploads',
         'activity',
+        'notice',
       ],
     ],
   },

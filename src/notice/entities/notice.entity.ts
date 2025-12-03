@@ -1,10 +1,12 @@
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('notices')
@@ -24,4 +26,10 @@ export class Notice {
   @ManyToOne(() => User, (u) => u.id, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'createdById' })
   createdBy: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

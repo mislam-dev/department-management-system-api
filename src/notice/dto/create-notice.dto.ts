@@ -1,13 +1,11 @@
-import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class CreateNoticeDto {
-  @IsUUID(undefined, { message: 'createdById must be a validate UUID' })
-  createdById: string;
-
   @IsString()
   text: string;
 
   @IsOptional()
   @IsString()
+  @IsUrl()
   attachment?: string;
 }
