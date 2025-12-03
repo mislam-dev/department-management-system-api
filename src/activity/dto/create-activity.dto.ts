@@ -1,4 +1,6 @@
 import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsValidLeadID } from '../decorators/is-valid-lead-id.decorator';
+import { IsValidRelatedEntityID } from '../decorators/is-valid-student-id.decorator';
 
 export class CreateActivityDto {
   @IsString()
@@ -14,9 +16,11 @@ export class CreateActivityDto {
 
   @IsOptional()
   @IsUUID()
+  @IsValidRelatedEntityID()
   relatedEntityId?: string;
 
   @IsOptional()
   @IsUUID()
+  @IsValidLeadID()
   leadId?: string;
 }

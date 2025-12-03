@@ -2,10 +2,12 @@ import { Notice } from 'src/notice/entities/notice.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('activities')
@@ -35,4 +37,10 @@ export class Activity {
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'leadId' })
   lead: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

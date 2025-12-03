@@ -1093,15 +1093,30 @@ paths:
       summary: List activities
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
       responses:
         '200':
           description: Array of activities
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Activity'
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  limit:
+                    type: number
+                    default: 10
+                  offset:
+                    type: number
+                    default: 0
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Activity'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1121,12 +1136,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ActivityCreateDTO'
-            example:
-              activityType: meeting
-              description: Curriculum planning
-              relatedEntityType: course
-              relatedEntityId: course-1
-              lead: user-123
       responses:
         '201':
           description: Created
@@ -1180,10 +1189,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ActivityCreateDTO'
-            example:
-              status: absent
-              notes: Sick
+              $ref: '#/components/schemas/ActivityUpdateDTO'
       responses:
         '202':
           description: Updated
@@ -1940,16 +1946,28 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         activityType:
           type: string
+          default: Notice board
         description:
           type: string
+          default: description
         relatedEntityType:
           type: string
+          default: entity type
         relatedEntityId:
           type: string
-        lead:
+          format: uuid
+        leadId:
           type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
       required: [id, activityType]
     ActivityCreateDTO:
       type: object
@@ -1957,14 +1975,39 @@ components:
       properties:
         activityType:
           type: string
+          default: meeting
         description:
           type: string
+          default: description
         relatedEntityType:
           type: string
+          default: entity type
         relatedEntityId:
           type: string
-        lead:
+          format: uuid
+        leadId:
           type: string
+          format: uuid
+    ActivityUpdateDTO:
+      type: object
+      required: [activityType]
+      properties:
+        activityType:
+          type: string
+          default: meeting
+        description:
+          type: string
+          default: description
+        relatedEntityType:
+          type: string
+          default: entity type
+        relatedEntityId:
+          type: string
+          format: uuid
+        leadId:
+          type: string
+          format: uuid
+
     # Notices
     Notice:
       type: object
