@@ -1363,15 +1363,30 @@ paths:
       summary: List reports
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
       responses:
         '200':
           description: Array of reports
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Report'
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  limit:
+                    type: number
+                    default: 10
+                  offset:
+                    type: number
+                    default: 0
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Report'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1392,12 +1407,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReportCreateDTO'
-            example:
-              title: Attendance Report
-              description: Attendance summary for CS101
-              type: attendance
-              parameters: '{"courseId":"course-1","from":"2024-01-01","to":"2024-06-30"}'
-              generatedBy: user-1
       responses:
         '201':
           description: Report created
@@ -2053,41 +2062,66 @@ components:
           type: string
           nullable: true
     # Reports
+    ReportTypeEnum:
+      type: string
+      description: Defines the specific category or type of the report being generated or requested.
+      enum:
+        - ANALYTICS
+        - PERFORMANCE
+        - ACTIVITY
+        - SALES
+        - FINANCIAL
+        - USER
+        - SYSTEM
+        - ERROR
+        - EXPORT
+        - CUSTOM
     Report:
       type: object
       properties:
         id:
           type: string
+          format: uuid
         title:
           type: string
+          default: December 2025 Attendance Report
         description:
           type: string
+          default: December 2025 Attendance Report
         type:
-          type: string
+          $ref: '#/components/schemas/ReportTypeEnum'
         generatedAt:
           type: string
           format: date-time
         filePath:
           type: string
+          default: https://www.pexels.com/photo/charming-rustic-house-in-provence-france-32802440/
         parameters:
           type: string
-        generatedBy:
+          default: '{
+            \"courseId\":\"course-1\",
+            \"from\":\"2024-01-01\",
+            \"to\":\"2024-06-30\",
+            }'
+        generatedById:
           type: string
-      required: [id, title, type]
+          format: uuid
+
     ReportCreateDTO:
       type: object
       required: [title, type]
       properties:
         title:
           type: string
+          default: December 2025 Attendance Report
         description:
           type: string
+          default: December 2025 Attendance Report
         type:
-          type: string
+          $ref: '#/components/schemas/ReportTypeEnum'
         parameters:
           type: string
-        generatedBy:
-          type: string
+          default: ''
   examples: {}
   responses:
     BadRequest:

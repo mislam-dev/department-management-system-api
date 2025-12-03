@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationOptions } from 'src/student/student.service';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dto/create-report.dto';
 import { Report } from './entities/report.entity';
@@ -11,7 +12,7 @@ export class ReportService {
     private readonly reportRepo: Repository<Report>,
   ) {}
 
-  async create(dto: CreateReportDto) {
+  async create(dto: CreateReportDto & { generatedById: string }) {
     const report = this.reportRepo.create({
       ...dto,
     });
@@ -19,9 +20,18 @@ export class ReportService {
     return this.reportRepo.save(report);
   }
 
-  async findAll(): Promise<Report[]> {
-    return this.reportRepo.find({
-      relations: ['generatedBy'],
+  async findAll({ limit, offset }: PaginationOptions) {
+    const [results, total] = await this.reportRepo.findAndCount({
+      skip: offset,
+      take: limit,
+      order: { generatedAt: 'desc' },
     });
+
+    return {
+      total,
+      limit,
+      offset,
+      results,
+    };
   }
 }

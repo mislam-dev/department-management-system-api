@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { ReportType } from '../entities/report.entity';
 
 export class CreateReportDto {
@@ -15,8 +15,4 @@ export class CreateReportDto {
   @IsOptional()
   @IsString()
   parameters?: string;
-
-  @IsOptional()
-  @IsUUID()
-  generatedById?: string;
 }
