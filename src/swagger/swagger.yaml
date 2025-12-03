@@ -811,15 +811,30 @@ paths:
       summary: Get schedules for a course
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
       responses:
         '200':
           description: Array of schedules
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CourseSchedule'
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  limit:
+                    type: number
+                    default: 10
+                  offset:
+                    type: number
+                    default: 0
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CourseSchedule'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -839,13 +854,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CourseScheduleCreateDTO'
-            example:
-              courseId: course-1
-              dayOfWeek: Monday
-              startTime: '09:00:00'
-              endTime: '10:30:00'
-              room: A101
-              teacherId: teacher-1
+
       responses:
         '201':
           description: Created
@@ -904,14 +913,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CourseScheduleCreateDTO'
-            example:
-              courseId: course-1
-              dayOfWeek: Monday
-              startTime: '09:00:00'
-              endTime: '10:30:00'
-              room: A101
-              teacherId: teacher-1
+              $ref: '#/components/schemas/CourseScheduleUpdateDTO'
       responses:
         '201':
           description: Created
@@ -1777,37 +1779,86 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         courseId:
           type: string
+          format: uuid
         dayOfWeek:
           type: string
+          default: MONDAY
         startTime:
           type: string
+          format: date
           description: time in HH:MM:SS
         endTime:
           type: string
+          format: date
           description: time in HH:MM:SS
         room:
           type: string
+          default: COM-201
         teacherId:
           type: string
-      required: [id, courseId, dayOfWeek]
+          format: uuid
+      required:
+        - id
+        - courseId
+        - dayOfWeek
+        - startTime
+        - endTime
+        - room
     CourseScheduleCreateDTO:
       type: object
-      required: [courseId, dayOfWeek, startTime, endTime]
+      required:
+        - courseId
+        - dayOfWeek
+        - startTime
+        - endTime
+        - room
       properties:
         courseId:
           type: string
+          format: uuid
         dayOfWeek:
           type: string
+          default: MONDAY
         startTime:
           type: string
+          format: date
+          description: time in HH:MM:SS
         endTime:
           type: string
+          format: date
+          description: time in HH:MM:SS
         room:
           type: string
+          default: COM-201
         teacherId:
           type: string
+          format: uuid
+    CourseScheduleUpdateDTO:
+      type: object
+      properties:
+        courseId:
+          type: string
+          format: uuid
+        dayOfWeek:
+          type: string
+          default: MONDAY
+        startTime:
+          type: string
+          format: date
+          description: time in HH:MM:SS
+        endTime:
+          type: string
+          format: date
+          description: time in HH:MM:SS
+        room:
+          type: string
+          default: COM-201
+        teacherId:
+          type: string
+          format: uuid
     # Attendance
     AttendanceRecord:
       type: object
