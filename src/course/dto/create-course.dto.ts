@@ -5,13 +5,17 @@ import {
   IsUUID,
   MinLength,
 } from 'class-validator';
+import { IsValidSemesterId } from 'src/semester/decorator/is-valid-semester-id.decorator';
+import { IsCodeUnique } from '../decorator/is-code-unique.decorator';
 
 export class CreateCourseDto {
   @IsUUID()
+  @IsValidSemesterId()
   semesterId: string;
 
   @IsString()
   @MinLength(3)
+  @IsCodeUnique()
   code: string;
 
   @IsString()
