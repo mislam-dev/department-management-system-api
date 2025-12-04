@@ -1,20 +1,21 @@
 services:
-  api:
+  api_prod:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: dms_api
+      dockerfile: Dockerfile.prod
+    container_name: dms_nestjs
     ports:
       - 3000:3000
-    env_file: .env
-    volumes:
-      - .:/app
-      - /app/node_modules
+    env_file:
+      - .env
     environment:
-      DB_HOST: postgres
+      NODE_ENV: production
+      DB_HOST: postgres_prod
     restart: unless-stopped
-    command: pnpm start:dev
-  postgres:
+    depends_on:
+      postgres_prod:
+        condition: service_healthy
+  postgres_prod:
     image: postgres:16-alpine
     container_name: dms-database
     environment:
@@ -24,7 +25,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - dms_data:/var/lib/postgresql/data
+      - dms_prod_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -32,4 +33,4 @@ services:
       retries: 5
 
 volumes:
-  dms_data:
+  dms_prod_data:
