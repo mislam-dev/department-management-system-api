@@ -9,7 +9,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
-  @SetRoles('admin')
+  @SetRoles('admin') // todo replace with permission attribute
   @Get('roles')
   usersRoles() {
     return this.authService.roles();

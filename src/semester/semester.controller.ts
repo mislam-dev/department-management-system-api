@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { Public } from 'src/auth/decorators/public.decorator';
-import { SetRolePermissions } from 'src/auth/decorators/set-roles-permissions.decorator';
+import { SetPermissions } from 'src/auth/decorators/set-permissions.decorator';
 import { CreateSemesterDto } from './dto/create-semester.dto';
 import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { SemesterService } from './semester.service';
@@ -17,7 +17,7 @@ import { SemesterService } from './semester.service';
 export class SemesterController {
   constructor(private readonly semesterService: SemesterService) {}
 
-  @SetRolePermissions(['admin'], ['semester:create'])
+  @SetPermissions('semester:create') // todo use only permissions
   @Post()
   create(@Body() createSemesterDto: CreateSemesterDto) {
     return this.semesterService.create(createSemesterDto);
@@ -35,7 +35,7 @@ export class SemesterController {
     return this.semesterService.findOne(id);
   }
 
-  @SetRolePermissions(['admin'], ['semester:update'])
+  @SetPermissions('semester:update')
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -44,7 +44,7 @@ export class SemesterController {
     return this.semesterService.update(id, updateSemesterDto);
   }
 
-  @SetRolePermissions(['admin'], ['semester:delete'])
+  @SetPermissions('semester:delete')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.semesterService.remove(id);
