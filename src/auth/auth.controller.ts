@@ -1,7 +1,7 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
-import { SetRoles } from './decorators/set-roles.decorator';
+import { SetPermissions } from './decorators/set-permissions.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -9,7 +9,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
-  @SetRoles('admin') // todo replace with permission attribute
+  @SetPermissions('roles:read')
   @Get('roles')
   usersRoles() {
     return this.authService.roles();
