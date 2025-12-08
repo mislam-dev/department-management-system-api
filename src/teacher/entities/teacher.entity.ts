@@ -1,5 +1,12 @@
 import { CourseSchedule } from 'src/course_schedule/entities/course_schedule.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TeacherUnavailability } from 'src/teacher_unavailability/entities/teacher_unavailability.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Teacher {
@@ -20,4 +27,7 @@ export class Teacher {
 
   @OneToMany(() => CourseSchedule, (cs) => cs.teacherId)
   courseSchedule: CourseSchedule[];
+
+  @ManyToOne(() => TeacherUnavailability, (tu) => tu.teacherId)
+  unavailability: TeacherUnavailability[];
 }
