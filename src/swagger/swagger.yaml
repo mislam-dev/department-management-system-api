@@ -531,6 +531,152 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /teacher/{teacherId}/unavailability:
+    parameters:
+      - name: teacherId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Teachers]
+      summary: List teachers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        '200':
+          description: Array of teachers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  limit:
+                    type: number
+                    default: 10
+                  offset:
+                    type: number
+                    default: 0
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TeacherUnavailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Teachers]
+      summary: Create teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherUnavailabilityCreateDto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherUnavailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /teacher/{teacherId}/unavailability/{id}:
+    parameters:
+      - name: teacherId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Teachers]
+      summary: Get single teacher
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Student record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherUnavailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [Teachers]
+      summary: Update teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherUnavailabilityUpdateDto'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherUnavailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Teachers]
+      summary: Delete teacher
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /semester:
     get:
       tags: [Semesters]
@@ -870,7 +1016,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-
   /course/{courseId}/schedule/{id}:
     parameters:
       - name: courseId
@@ -1733,6 +1878,100 @@ components:
         officeLocation:
           type: string
           default: COM-201
+    # Teacher Unavailability
+    TeacherUnavailability:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the unavailability record.
+          example: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+        teacherId:
+          type: string
+          format: uuid
+          description: The UUID of the teacher associated with this record.
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        startDatetime:
+          type: string
+          format: date-time
+          description: The start timestamp of the unavailability (ISO 8601).
+          example: '2023-12-01T09:00:00.000Z'
+        endDatetime:
+          type: string
+          format: date-time
+          description: The end timestamp of the unavailability (ISO 8601).
+          example: '2023-12-01T17:00:00.000Z'
+        reason:
+          type: string
+          description: The reason for the unavailability.
+          maxLength: 255
+          nullable: true
+          example: 'Doctor Appointment'
+        isApproved:
+          type: boolean
+          description: Indicates if the unavailability request is approved.
+          default: true
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the record was created.
+          example: '2023-11-30T10:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the record was last updated.
+          example: '2023-11-30T12:00:00.000Z'
+    TeacherUnavailabilityCreateDto:
+      type: object
+      required:
+        - startDatetime
+        - endDatetime
+      properties:
+        startDatetime:
+          type: string
+          format: date-time
+          description: The start date and time of the unavailability.
+          example: '2023-12-01T09:00:00Z'
+        endDatetime:
+          type: string
+          format: date-time
+          description: The end date and time of the unavailability.
+          example: '2023-12-01T17:00:00Z'
+        reason:
+          type: string
+          description: Optional reason provided for the unavailability.
+          maxLength: 255
+          example: 'Family emergency'
+        isApproved:
+          type: boolean
+          description: Optional flag to set approval status on creation.
+          default: true
+          example: true
+    TeacherUnavailabilityUpdateDto:
+      type: object
+      properties:
+        startDatetime:
+          type: string
+          format: date-time
+          description: The start date and time of the unavailability.
+          example: '2023-12-01T09:00:00Z'
+        endDatetime:
+          type: string
+          format: date-time
+          description: The end date and time of the unavailability.
+          example: '2023-12-01T17:00:00Z'
+        reason:
+          type: string
+          description: Optional reason provided for the unavailability.
+          maxLength: 255
+          example: 'Family emergency'
+        isApproved:
+          type: boolean
+          description: Optional flag to set approval status on creation.
+          default: true
+          example: true
     # Semester
     Semester:
       type: object
