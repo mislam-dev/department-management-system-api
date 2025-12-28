@@ -8,6 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { SetPermissions } from 'src/auth/decorators/set-permissions.decorator';
 import { User, type UserPayload } from 'src/auth/decorators/user.decorator';
 import { PaginationDto } from 'src/pagination/pagination.dto';
 import { CreateTeacherAttendanceDto } from './dto/create-teacher-attendance.dto';
@@ -20,20 +21,21 @@ export class TeacherAttendanceController {
     private readonly teacherAttendanceService: TeacherAttendanceService,
   ) {}
 
+  @SetPermissions('teacher-attendance:add')
   @Post()
   create(
     @Body() createTeacherAttendanceDto: CreateTeacherAttendanceDto,
     @Param('teacherId') teacherId: string,
     @User() user: UserPayload,
   ) {
-    // console.log('test');
     return this.teacherAttendanceService.create({
       ...createTeacherAttendanceDto,
       teacherId,
-      recordedById: user.sub,
+      recordedById: user.userId,
     });
   }
 
+  @SetPermissions('teacher-attendance:read')
   @Get()
   findAll(
     @Param('teacherId') teacherId: string,
@@ -42,11 +44,13 @@ export class TeacherAttendanceController {
     return this.teacherAttendanceService.findAll({ teacherId, ...pagination });
   }
 
+  @SetPermissions('teacher-attendance:read')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.teacherAttendanceService.findOne(id);
   }
 
+  @SetPermissions('teacher-attendance:update')
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -55,6 +59,7 @@ export class TeacherAttendanceController {
     return this.teacherAttendanceService.update(id, updateTeacherAttendanceDto);
   }
 
+  @SetPermissions('teacher-attendance:remove')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.teacherAttendanceService.remove(id);

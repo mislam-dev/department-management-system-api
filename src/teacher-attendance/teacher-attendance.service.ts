@@ -18,7 +18,8 @@ export class TeacherAttendanceService {
       recordedById: string;
     },
   ) {
-    return this.repo.create(createDto);
+    const data = this.repo.create(createDto);
+    return this.repo.save(data);
   }
 
   async findAll({

@@ -714,7 +714,7 @@ paths:
                   results:
                     type: array
                     items:
-                      $ref: '#/components/schemas/TeacherUnavailability'
+                      $ref: '#/components/schemas/TeacherAttendance'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -733,14 +733,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TeacherUnavailabilityCreateDto'
+              $ref: '#/components/schemas/TeacherAttendanceCreateDto'
       responses:
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeacherUnavailability'
+                $ref: '#/components/schemas/TeacherAttendance'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -772,7 +772,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeacherUnavailability'
+                $ref: '#/components/schemas/TeacherAttendance'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -792,14 +792,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TeacherUnavailabilityUpdateDto'
+              $ref: '#/components/schemas/TeacherAttendanceUpdateDto'
       responses:
         '202':
           description: Updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeacherUnavailability'
+                $ref: '#/components/schemas/TeacherAttendance'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2120,6 +2120,67 @@ components:
           description: Optional flag to set approval status on creation.
           default: true
           example: true
+    # Teacher Attendance
+    TeacherAttendance:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the unavailability record.
+          example: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+        teacherId:
+          type: string
+          format: uuid
+          description: The UUID of the teacher associated with this record.
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        dateTime:
+          type: string
+          format: date-time
+          description: The start timestamp of the unavailability (ISO 8601).
+          example: '2023-12-01T09:00:00.000Z'
+        status:
+          type: string
+          default: PRESENT
+        recordedById:
+          type: string
+          format: uuid
+          description: The UUID of the recoded system.
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        notes:
+          type: string
+          description: The notes.
+          maxLength: 255
+          nullable: true
+          example: 'Doctor Appointment'
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the record was created.
+          example: '2023-11-30T10:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the record was last updated.
+          example: '2023-11-30T12:00:00.000Z'
+    TeacherAttendanceCreateDto:
+      type: object
+      properties:
+        notes:
+          type: string
+          description: The notes.
+          maxLength: 255
+          nullable: true
+          example: 'Doctor Appointment'
+    TeacherAttendanceUpdateDto:
+      type: object
+      properties:
+        notes:
+          type: string
+          description: The notes.
+          maxLength: 255
+          nullable: true
+          example: 'Doctor Appointment'
     # Semester
     Semester:
       type: object
