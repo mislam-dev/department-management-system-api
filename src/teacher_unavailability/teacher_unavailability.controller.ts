@@ -8,6 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { SetPermissions } from 'src/auth/decorators/set-permissions.decorator';
 import { PaginationDto } from 'src/pagination/pagination.dto';
 import { CreateTeacherUnavailabilityDto } from './dto/create-teacher_unavailability.dto';
 import { ResourceParamDto } from './dto/resource-query.dto';
@@ -20,6 +21,7 @@ export class TeacherUnavailabilityController {
     private readonly teacherUnavailabilityService: TeacherUnavailabilityService,
   ) {}
 
+  @SetPermissions('teacher-unavailability:add')
   @Post()
   create(
     @Body() createDto: CreateTeacherUnavailabilityDto,
@@ -31,6 +33,7 @@ export class TeacherUnavailabilityController {
     });
   }
 
+  @SetPermissions('teacher-unavailability:read')
   @Get()
   findAll(
     @Param() { teacherId }: ResourceParamDto,
@@ -42,11 +45,13 @@ export class TeacherUnavailabilityController {
     });
   }
 
+  @SetPermissions('teacher-unavailability:read')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.teacherUnavailabilityService.findOne(id);
   }
 
+  @SetPermissions('teacher-unavailability:update')
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -58,6 +63,7 @@ export class TeacherUnavailabilityController {
     );
   }
 
+  @SetPermissions('teacher-unavailability:remove')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.teacherUnavailabilityService.remove(id);
