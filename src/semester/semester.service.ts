@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreateSemesterDto } from './dto/create-semester.dto';
 import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { Semester } from './entities/semester.entity';
@@ -17,6 +17,10 @@ export class SemesterService {
 
   findAll() {
     return this.repo.find();
+  }
+
+  find(options?: FindManyOptions<Semester>) {
+    return this.repo.find(options);
   }
 
   async findOne(id: string) {

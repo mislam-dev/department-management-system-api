@@ -28,4 +28,10 @@ export class CreateCourseDto {
 
   @IsInt()
   credits: number;
+
+  @IsInt()
+  theoryCredits: number;
+
+  @IsInt()
+  practicalCredits: number;
 }

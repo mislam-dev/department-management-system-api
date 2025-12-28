@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationOptions } from 'src/pagination/pagination.types';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { Teacher } from './entities/teacher.entity';
@@ -42,6 +42,9 @@ export class TeacherService {
       offset,
       results,
     };
+  }
+  find(options?: FindManyOptions<Teacher>) {
+    return this.repo.find(options);
   }
 
   async findOne(id: string) {

@@ -5,6 +5,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { ActivityModule } from './activity/activity.module';
+import { AiModule } from './ai/ai.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AttendanceModule } from './attendance/attendance.module';
@@ -64,6 +65,7 @@ import { UserModule } from './user/user.module';
     ReportModule,
     TeacherUnavailabilityModule,
     TeacherAttendanceModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AiService } from 'src/ai/ai.service';
 import { CourseService } from 'src/course/course.service';
 import { PaginationOptions } from 'src/student/student.service';
 import { Repository } from 'typeorm';
@@ -13,6 +14,7 @@ export class CourseScheduleService {
     @InjectRepository(CourseSchedule)
     private readonly repo: Repository<CourseSchedule>,
     private readonly courseService: CourseService,
+    private readonly aiService: AiService,
   ) {}
   async create(courseId: string, createDto: CreateCourseScheduleDto) {
     await this.courseService.findOne(courseId);
@@ -21,6 +23,17 @@ export class CourseScheduleService {
   }
 
   async findAll(courseId: string, paginationOptions: PaginationOptions) {
+    // await this.aiService.courseScheduleAssistant({
+    //   semesters: {
+    //     ids: [
+    //       'a1593306-7fd2-453b-a34c-79c165a9380b',
+    //       '19db3fcc-da9d-4539-bc77-c7b00d46cd60',
+    //     ],
+    //     start: '01-01-25',
+    //     end: '01-01-26',
+    //   },
+    // });
+
     const { limit, offset } = paginationOptions;
     const [results, total] = await this.repo.findAndCount({
       where: { courseId },

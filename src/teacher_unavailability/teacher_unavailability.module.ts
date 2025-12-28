@@ -10,5 +10,6 @@ import { ValidTeacherIdConstraints } from './validators/is-valid-teacher-id.vali
   controllers: [TeacherUnavailabilityController],
   providers: [TeacherUnavailabilityService, ValidTeacherIdConstraints],
   imports: [TypeOrmModule.forFeature([TeacherUnavailability]), TeacherModule],
+  exports: [TeacherUnavailabilityService],
 })
 export class TeacherUnavailabilityModule {}
