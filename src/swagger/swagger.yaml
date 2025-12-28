@@ -23,6 +23,8 @@ tags:
     description: Student records and enrollment
   - name: Teachers
     description: Teacher records
+  - name: TeachersAttendance
+    description: Teacher Attendance records
   - name: Courses
     description: Courses and course details
   - name: CourseSchedules
@@ -662,6 +664,152 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       tags: [Teachers]
+      summary: Delete teacher
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /teacher/{teacherId}/attendance:
+    parameters:
+      - name: teacherId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [TeachersAttendance]
+      summary: List teachers attendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        '200':
+          description: Array of teachers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  limit:
+                    type: number
+                    default: 10
+                  offset:
+                    type: number
+                    default: 0
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TeacherUnavailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [TeachersAttendance]
+      summary: Create teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherUnavailabilityCreateDto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherUnavailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /teacher/{teacherId}/attendance/{id}:
+    parameters:
+      - name: teacherId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [TeachersAttendance]
+      summary: Get single teacher
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Student record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherUnavailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [TeachersAttendance]
+      summary: Update teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherUnavailabilityUpdateDto'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherUnavailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [TeachersAttendance]
       summary: Delete teacher
       security:
         - bearerAuth: []

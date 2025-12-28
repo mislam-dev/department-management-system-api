@@ -14,7 +14,7 @@ import { CreateTeacherAttendanceDto } from './dto/create-teacher-attendance.dto'
 import { UpdateTeacherAttendanceDto } from './dto/update-teacher-attendance.dto';
 import { TeacherAttendanceService } from './teacher-attendance.service';
 
-@Controller('teacher/{teacherId}/attendance')
+@Controller('teacher/:teacherId/attendance')
 export class TeacherAttendanceController {
   constructor(
     private readonly teacherAttendanceService: TeacherAttendanceService,
@@ -23,7 +23,7 @@ export class TeacherAttendanceController {
   @Post()
   create(
     @Body() createTeacherAttendanceDto: CreateTeacherAttendanceDto,
-    @Query('teacherId') teacherId: string,
+    @Param('teacherId') teacherId: string,
     @User() user: UserPayload,
   ) {
     // console.log('test');
@@ -36,7 +36,7 @@ export class TeacherAttendanceController {
 
   @Get()
   findAll(
-    @Query('teacherId') teacherId: string,
+    @Param('teacherId') teacherId: string,
     @Query() pagination: PaginationDto,
   ) {
     return this.teacherAttendanceService.findAll({ teacherId, ...pagination });
