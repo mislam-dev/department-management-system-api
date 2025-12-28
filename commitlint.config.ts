@@ -37,6 +37,7 @@ module.exports = {
         'auth',
         'user',
         'teacher',
+        'teacher-attendance',
         'staff',
         'semester',
         'config',
