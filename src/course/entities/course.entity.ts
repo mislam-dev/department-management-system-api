@@ -20,9 +20,9 @@ export class Course {
   @Column({ type: 'int' })
   credits: number;
 
-  @Column({ type: 'int', default: 3 })
+  @Column({ type: 'int', default: 2 })
   theoryCredits: number;
 
-  @Column({ type: 'int', default: 1 })
+  @Column({ type: 'int', default: 0 })
   practicalCredits: number;
 }

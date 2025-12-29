@@ -18,10 +18,12 @@ import { Auth0Module } from './auth0/auth0.module';
 import { auth0_m2m } from './config/auth0-m2m.config';
 import auth0Config from './config/auth0.config';
 import { databaseConfig } from './config/database.config';
+import { CourseGenerateModule } from './course-generate/course-generate.module';
 import { CourseModule } from './course/course.module';
 import { CourseScheduleModule } from './course_schedule/course_schedule.module';
 import { NoticeModule } from './notice/notice.module';
 import { ReportModule } from './report/report.module';
+import { SeederModule } from './seeder/seeder.module';
 import { SemesterModule } from './semester/semester.module';
 import { StudentModule } from './student/student.module';
 import { TeacherAttendanceModule } from './teacher-attendance/teacher-attendance.module';
@@ -66,6 +68,8 @@ import { UserModule } from './user/user.module';
     TeacherUnavailabilityModule,
     TeacherAttendanceModule,
     AiModule,
+    CourseGenerateModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [

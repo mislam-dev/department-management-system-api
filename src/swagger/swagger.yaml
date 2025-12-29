@@ -1093,6 +1093,35 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /course-generate:
+    post:
+      tags: [Courses]
+      summary: Generate course with ai
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseGenerateDTO'
+              credits: 3
+      responses:
+        '201':
+          description: New created course
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courses'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /course/{courseId}/schedule:
     parameters:
       - name: courseId
@@ -2248,6 +2277,31 @@ components:
           type: string
         credits:
           type: integer
+
+    # course generate
+    CourseGenerateDTO:
+      type: object
+      required:
+        - ids
+        - start
+        - end
+      properties:
+        semesterIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: List of semester IDs to process
+        semesterStart:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00Z'
+          description: Start date in ISO 8601 format
+        semesterEnd:
+          type: string
+          format: date-time
+          example: '2023-01-31T23:59:59Z'
+          description: End date in ISO 8601 format
     # Course Schedule
     CourseSchedule:
       type: object
