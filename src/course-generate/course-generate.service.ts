@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AiService } from 'src/ai/ai.service';
+import { Repository } from 'typeorm';
 import { CourseGenerateDto } from './dto/create-course-generate.dto';
+import { CourseGenerate } from './entities/course-generate.entity';
 
 @Injectable()
 export class CourseGenerateService {
-  constructor(private readonly aiService: AiService) {}
+  constructor(
+    @InjectRepository(CourseGenerate)
+    private readonly repo: Repository<CourseGenerate>,
+    private readonly aiService: AiService,
+  ) {}
   async generate(dto: CourseGenerateDto) {
     const data = await this.aiService.courseScheduleAssistant({
       semesters: {
@@ -13,7 +20,8 @@ export class CourseGenerateService {
         ids: dto.semesterIds,
       },
     });
-
-    return data;
+    const save = this.repo.create({ data });
+    const savedData = await this.repo.save(save);
+    return savedData;
   }
 }
