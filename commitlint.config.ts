@@ -36,6 +36,7 @@ module.exports = {
         'attendance',
         'auth',
         'user',
+        'room',
         'teacher',
         'teacher-attendance',
         'staff',

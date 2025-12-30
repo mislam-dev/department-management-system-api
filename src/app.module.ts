@@ -30,6 +30,7 @@ import { TeacherAttendanceModule } from './teacher-attendance/teacher-attendance
 import { TeacherModule } from './teacher/teacher.module';
 import { TeacherUnavailabilityModule } from './teacher_unavailability/teacher_unavailability.module';
 import { UserModule } from './user/user.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { UserModule } from './user/user.module';
     AiModule,
     CourseGenerateModule,
     SeederModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [

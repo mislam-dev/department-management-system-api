@@ -29,6 +29,8 @@ tags:
     description: Courses and course details
   - name: CourseSchedules
     description: Course scheduling
+  - name: Room
+    description: Room
   - name: Attendance
     description: Attendance records
   - name: Activities
@@ -1268,6 +1270,130 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /room:
+    get:
+      tags: [Room]
+      summary: List rooms
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Array of courses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    default: 1
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Room]
+      summary: Create room
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreateDto'
+
+      responses:
+        '201':
+          description: New created room
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /room/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Room]
+      summary: Get room
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Room
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Room]
+      summary: Update room
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomUpdateDto'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courses'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Room]
+      summary: Delete room
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /attendance:
     get:
       tags: [Attendance]
@@ -2388,6 +2514,79 @@ components:
         teacherId:
           type: string
           format: uuid
+    # room
+    RoomType:
+      type: string
+      enum: [office, classroom, lab, washroom]
+      description: The category/type of the room.
+
+    Room:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        name:
+          type: string
+          example: 'Advanced Robotics Lab'
+        location:
+          type: string
+          example: 'Building B, 3rd Floor'
+        type:
+          $ref: '#/components/schemas/RoomType'
+        capacity:
+          type: integer
+          minimum: 1
+          example: 30
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - location
+        - type
+        - capacity
+
+    RoomCreateDto:
+      type: object
+      required:
+        - name
+        - location
+        - type
+        - capacity
+      properties:
+        name:
+          type: string
+          minLength: 1
+          example: 'Office 101'
+        location:
+          type: string
+          example: 'Main Campus, Block A'
+        type:
+          $ref: '#/components/schemas/RoomType'
+        capacity:
+          type: integer
+          minimum: 1
+          example: 5
+
+    RoomUpdateDto:
+      type: object
+      description: Partial update object for Room. All fields are optional.
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        type:
+          $ref: '#/components/schemas/RoomType'
+        capacity:
+          type: integer
+          minimum: 1
     # Attendance
     AttendanceRecord:
       type: object
