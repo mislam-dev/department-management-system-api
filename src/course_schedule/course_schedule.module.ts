@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AiModule } from 'src/ai/ai.module';
 import { CourseModule } from 'src/course/course.module';
 import { CourseScheduleController } from './course_schedule.controller';
 import { CourseScheduleService } from './course_schedule.service';
@@ -20,7 +21,7 @@ import { IsValidTimeRangeConstraint } from './validators/is-valid-time-range.val
     IsTeacherAvailableConstraint,
     IsValidTimeRangeConstraint,
   ],
-  imports: [TypeOrmModule.forFeature([CourseSchedule]), CourseModule],
+  imports: [TypeOrmModule.forFeature([CourseSchedule]), CourseModule, AiModule],
   exports: [CourseScheduleService],
 })
 export class CourseScheduleModule {}

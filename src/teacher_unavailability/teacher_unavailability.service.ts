@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationOptions } from 'src/student/student.service';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreateTeacherUnavailabilityDto } from './dto/create-teacher_unavailability.dto';
 import { UpdateTeacherUnavailabilityDto } from './dto/update-teacher_unavailability.dto';
 import { TeacherUnavailability } from './entities/teacher_unavailability.entity';
@@ -35,6 +35,10 @@ export class TeacherUnavailabilityService {
       offset,
       results,
     };
+  }
+
+  find(options?: FindManyOptions<TeacherUnavailability>) {
+    return this.repo.find(options);
   }
 
   async findOne(id: string) {

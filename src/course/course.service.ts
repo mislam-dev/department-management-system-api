@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationOptions } from 'src/pagination/pagination.types';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
@@ -28,6 +28,10 @@ export class CourseService {
       offset,
       results,
     };
+  }
+
+  find(options?: FindManyOptions<Course>) {
+    return this.repo.find(options);
   }
 
   async findOne(id: string) {
