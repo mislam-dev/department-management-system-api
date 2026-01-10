@@ -8,13 +8,15 @@ import { Activity } from './entities/activity.entity';
 
 describe('ActivityService', () => {
   let service: ActivityService;
-  let repository: any;
 
-  const mockActivity = {
-    id: 'activity-id',
-    title: 'Activity',
+  const mockActivityId = 'uuid-id';
+
+  const mockActivity: Partial<Activity> = {
+    id: mockActivityId,
+    activityType: 'notice',
     description: 'Desc',
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   const mockRepository = {
@@ -37,7 +39,6 @@ describe('ActivityService', () => {
     }).compile();
 
     service = module.get<ActivityService>(ActivityService);
-    repository = module.get(getRepositoryToken(Activity));
   });
 
   afterEach(() => {
@@ -51,28 +52,28 @@ describe('ActivityService', () => {
   describe('create', () => {
     it('should create activity', async () => {
       const createDto: CreateActivityDto = {
-        title: 'Activity',
-        description: 'Desc',
+        activityType: 'notice',
+        description: 'desc',
       };
       mockRepository.create.mockReturnValue(mockActivity);
       mockRepository.save.mockResolvedValue(mockActivity);
 
       const result = await service.create(createDto);
-      expect(repository.create).toHaveBeenCalledWith(createDto);
-      expect(repository.save).toHaveBeenCalledWith(mockActivity);
+      expect(mockRepository.create).toHaveBeenCalledWith(createDto);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockActivity);
       expect(result).toEqual(mockActivity);
     });
   });
 
   describe('findAll', () => {
-    it('should return activities', async () => {
+    it('should return an array of activities with pagination', async () => {
       const limit = 10;
       const offset = 0;
       const total = 1;
       mockRepository.findAndCount.mockResolvedValue([[mockActivity], total]);
 
       const result = await service.findAll({ limit, offset });
-      expect(repository.findAndCount).toHaveBeenCalledWith({
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
         take: limit,
         skip: offset,
         order: { createdAt: 'desc' },
@@ -85,28 +86,42 @@ describe('ActivityService', () => {
     it('should return activity', async () => {
       mockRepository.findOne.mockResolvedValue(mockActivity);
       const result = await service.findOne('id');
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 'id' } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 'id' },
+      });
       expect(result).toEqual(mockActivity);
     });
 
-    it('should throw NotFoundException if not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-      await expect(service.findOne('id')).rejects.toThrow(NotFoundException);
+    it('should throw NotFoundException if activity not found', async () => {
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
+      await expect(service.findOne(mockActivityId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('update', () => {
     it('should update activity', async () => {
-      const updateDto: UpdateActivityDto = { title: 'Updated' };
-      mockRepository.findOne.mockResolvedValue(mockActivity);
+      const updateDto: UpdateActivityDto = { activityType: 'Updated' };
       const updated = { ...mockActivity, ...updateDto };
+
+      mockRepository.findOne.mockResolvedValue(mockActivity);
       mockRepository.save.mockResolvedValue(updated);
 
-      const result = await service.update('id', updateDto);
-      expect(repository.save).toHaveBeenCalledWith(
-        expect.objectContaining(updateDto),
-      );
+      const result = await service.update(mockActivityId, updateDto);
+
+      expect(mockRepository.save).toHaveBeenCalledWith(updated);
       expect(result).toEqual(updated);
+    });
+
+    it('should throw NotFoundException if activity not found', async () => {
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
+      const updateDto: UpdateActivityDto = { activityType: 'Updated' };
+
+      await expect(service.update(mockActivityId, updateDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
   });
 
@@ -115,8 +130,15 @@ describe('ActivityService', () => {
       mockRepository.findOne.mockResolvedValue(mockActivity);
       mockRepository.remove.mockResolvedValue(mockActivity);
 
-      await service.remove('id');
-      expect(repository.remove).toHaveBeenCalledWith(mockActivity);
+      await service.remove(mockActivityId);
+      expect(mockRepository.remove).toHaveBeenCalledWith(mockActivity);
+    });
+    it('should throw NotFoundException if activity not found', async () => {
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
+      await expect(service.remove(mockActivityId)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockRepository.remove).not.toHaveBeenCalled();
     });
   });
 });

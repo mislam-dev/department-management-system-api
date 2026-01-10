@@ -7,31 +7,38 @@ import { CreateCourseScheduleDto } from './dto/create-course_schedule.dto';
 import { UpdateCourseScheduleDto } from './dto/update-course_schedule.dto';
 import { CourseSchedule } from './entities/course_schedule.entity';
 
+const mockCourseId = 'course-id';
+const mockId = 'schedule-id';
+const mockSchedule = {
+  id: mockId,
+  courseId: mockCourseId,
+  dayOfWeek: 'Monday',
+  startTime: '10:00',
+  endTime: '11:00',
+  roomNo: '101',
+};
+
+const mockRepository = {
+  create: jest.fn(),
+  save: jest.fn(),
+  findAndCount: jest.fn(),
+  findOne: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockCourseService = {
+  findOne: jest.fn(),
+};
+const createDto: CreateCourseScheduleDto = {
+  dayOfWeek: 'Monday',
+  startTime: '10:00',
+  endTime: '11:00',
+  room: '100',
+};
+const updateDto: UpdateCourseScheduleDto = { room: '102' };
+
 describe('CourseScheduleService', () => {
   let service: CourseScheduleService;
-  let repository: any;
-  let courseService: any;
-
-  const mockSchedule = {
-    id: 'schedule-id',
-    courseId: 'course-id',
-    dayOfWeek: 'Monday',
-    startTime: '10:00',
-    endTime: '11:00',
-    roomNo: '101',
-  };
-
-  const mockRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    findAndCount: jest.fn(),
-    findOne: jest.fn(),
-    delete: jest.fn(),
-  };
-
-  const mockCourseService = {
-    findOne: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -49,8 +56,6 @@ describe('CourseScheduleService', () => {
     }).compile();
 
     service = module.get<CourseScheduleService>(CourseScheduleService);
-    repository = module.get(getRepositoryToken(CourseSchedule));
-    courseService = module.get(CourseService);
   });
 
   afterEach(() => {
@@ -63,26 +68,29 @@ describe('CourseScheduleService', () => {
 
   describe('create', () => {
     it('should create a schedule', async () => {
-      const createDto: CreateCourseScheduleDto = {
-        dayOfWeek: 'Monday',
-        startTime: '10:00',
-        endTime: '11:00',
-        room: '100',
-      };
-
-      mockCourseService.findOne.mockResolvedValue({ id: 'course-id' });
+      mockCourseService.findOne.mockResolvedValue({ id: mockCourseId });
       mockRepository.create.mockReturnValue(mockSchedule);
       mockRepository.save.mockResolvedValue(mockSchedule);
 
-      const result = await service.create('course-id', createDto);
+      const result = await service.create(mockCourseId, createDto);
 
-      expect(courseService.findOne).toHaveBeenCalledWith('course-id');
-      expect(repository.create).toHaveBeenCalledWith({
+      expect(mockCourseService.findOne).toHaveBeenCalledWith(mockCourseId);
+      expect(mockRepository.create).toHaveBeenCalledWith({
         ...createDto,
-        courseId: 'course-id',
+        courseId: mockCourseId,
       });
-      expect(repository.save).toHaveBeenCalledWith(mockSchedule);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockSchedule);
       expect(result).toEqual(mockSchedule);
+    });
+
+    it('should throw NotFoundException if course not found', async () => {
+      mockCourseService.findOne.mockRejectedValue(new NotFoundException());
+      await expect(service.create('invalid id', createDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockCourseService.findOne).toHaveBeenCalledWith('invalid id');
+      expect(mockRepository.create).not.toHaveBeenCalled();
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
   });
 
@@ -96,7 +104,7 @@ describe('CourseScheduleService', () => {
 
       const result = await service.findAll(courseId, { limit, offset });
 
-      expect(repository.findAndCount).toHaveBeenCalledWith({
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
         where: { courseId },
         skip: offset,
         take: limit,
@@ -108,44 +116,57 @@ describe('CourseScheduleService', () => {
   describe('findOne', () => {
     it('should return a schedule', async () => {
       mockRepository.findOne.mockResolvedValue(mockSchedule);
-      const result = await service.findOne('id');
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 'id' } });
+      const result = await service.findOne(mockId);
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: mockId },
+      });
       expect(result).toEqual(mockSchedule);
     });
 
     it('should throw NotFoundException if not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-      await expect(service.findOne('id')).rejects.toThrow(NotFoundException);
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
+      await expect(service.findOne(mockId)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('update', () => {
     it('should update a schedule', async () => {
-      const updateDto: UpdateCourseScheduleDto = { room: '102' };
       mockRepository.findOne.mockResolvedValue(mockSchedule);
       const updatedSchedule = { ...mockSchedule, ...updateDto };
       mockRepository.save.mockResolvedValue(updatedSchedule);
 
-      const result = await service.update('id', updateDto);
+      const result = await service.update(mockId, updateDto);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 'id' } });
-      expect(repository.save).toHaveBeenCalledWith(
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: mockId },
+      });
+      expect(mockRepository.save).toHaveBeenCalledWith(
         expect.objectContaining(updateDto),
       );
       expect(result).toEqual(updatedSchedule);
+    });
+    it('should throw NotFoundException if not found', async () => {
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
+      await expect(service.update(mockId, updateDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: mockId },
+      });
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
   });
 
   describe('remove', () => {
     it('should remove a schedule', async () => {
       mockRepository.delete.mockResolvedValue({ affected: 1 });
-      await service.remove('id');
-      expect(repository.delete).toHaveBeenCalledWith({ id: 'id' });
+      await service.remove(mockId);
+      expect(mockRepository.delete).toHaveBeenCalledWith({ id: mockId });
     });
 
     it('should throw NotFoundException if not found', async () => {
-      mockRepository.delete.mockResolvedValue({ affected: 0 });
-      await expect(service.remove('id')).rejects.toThrow(NotFoundException);
+      mockRepository.delete.mockRejectedValue(new NotFoundException());
+      await expect(service.remove(mockId)).rejects.toThrow(NotFoundException);
     });
   });
 });

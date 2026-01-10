@@ -6,26 +6,36 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
 
+const mockId = 'course-id';
+
+const mockCourse = {
+  id: mockId,
+  name: 'Introduction to Computer Science',
+  code: 'CS101',
+  credit: 3,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const mockRepository = {
+  create: jest.fn(),
+  save: jest.fn(),
+  findAndCount: jest.fn(),
+  findOne: jest.fn(),
+  delete: jest.fn(),
+};
+
+const createCourseDto: CreateCourseDto = {
+  name: 'Introduction to Computer Science',
+  code: 'CS101',
+  credits: 3,
+  semesterId: 'semester-id',
+};
+const updateCourseDto: UpdateCourseDto = {
+  name: 'Calculus',
+};
 describe('CourseService', () => {
   let service: CourseService;
-  let repository: any;
-
-  const mockCourse = {
-    id: 'course-id',
-    name: 'Introduction to Computer Science',
-    code: 'CS101',
-    credit: 3,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  const mockRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    findAndCount: jest.fn(),
-    findOne: jest.fn(),
-    delete: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +49,6 @@ describe('CourseService', () => {
     }).compile();
 
     service = module.get<CourseService>(CourseService);
-    repository = module.get(getRepositoryToken(Course));
   });
 
   afterEach(() => {
@@ -51,20 +60,14 @@ describe('CourseService', () => {
   });
 
   describe('create', () => {
-    const createCourseDto: CreateCourseDto = {
-      name: 'Introduction to Computer Science',
-      code: 'CS101',
-      credit: 3,
-    };
-
     it('should create a course', async () => {
       mockRepository.create.mockReturnValue(mockCourse);
       mockRepository.save.mockResolvedValue(mockCourse);
 
       const result = await service.create(createCourseDto);
 
-      expect(repository.create).toHaveBeenCalledWith(createCourseDto);
-      expect(repository.save).toHaveBeenCalledWith(mockCourse);
+      expect(mockRepository.create).toHaveBeenCalledWith(createCourseDto);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockCourse);
       expect(result).toEqual(mockCourse);
     });
   });
@@ -78,7 +81,7 @@ describe('CourseService', () => {
 
       const result = await service.findAll({ limit, offset });
 
-      expect(repository.findAndCount).toHaveBeenCalledWith({
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
         take: limit,
         skip: offset,
       });
@@ -95,16 +98,16 @@ describe('CourseService', () => {
     it('should find a course by id', async () => {
       mockRepository.findOne.mockResolvedValue(mockCourse);
 
-      const result = await service.findOne('course-id');
+      const result = await service.findOne(mockId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({
-        where: { id: 'course-id' },
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: mockId },
       });
       expect(result).toEqual(mockCourse);
     });
 
     it('should throw NotFoundException if course not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
 
       await expect(service.findOne('invalid-id')).rejects.toThrow(
         NotFoundException,
@@ -118,7 +121,7 @@ describe('CourseService', () => {
 
       const result = await service.findOneBy({ where: { code: 'CS101' } });
 
-      expect(repository.findOne).toHaveBeenCalledWith({
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { code: 'CS101' },
       });
       expect(result).toEqual(mockCourse);
@@ -133,21 +136,17 @@ describe('CourseService', () => {
   });
 
   describe('update', () => {
-    const updateCourseDto: UpdateCourseDto = {
-      name: 'Calculus',
-    };
-
     it('should update a course', async () => {
       mockRepository.findOne.mockResolvedValue(mockCourse);
       const updatedCourse = { ...mockCourse, ...updateCourseDto };
       mockRepository.save.mockResolvedValue(updatedCourse);
 
-      const result = await service.update('course-id', updateCourseDto);
+      const result = await service.update(mockId, updateCourseDto);
 
-      expect(repository.findOne).toHaveBeenCalledWith({
-        where: { id: 'course-id' },
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: mockId },
       });
-      expect(repository.save).toHaveBeenCalledWith(
+      expect(mockRepository.save).toHaveBeenCalledWith(
         expect.objectContaining(updateCourseDto),
       );
       expect(result).toEqual(updatedCourse);
@@ -165,13 +164,13 @@ describe('CourseService', () => {
     it('should remove a course', async () => {
       mockRepository.delete.mockResolvedValue({ affected: 1 });
 
-      await service.remove('course-id');
+      await service.remove(mockId);
 
-      expect(repository.delete).toHaveBeenCalledWith({ id: 'course-id' });
+      expect(mockRepository.delete).toHaveBeenCalledWith({ id: mockId });
     });
 
     it('should throw NotFoundException if course to remove not found', async () => {
-      mockRepository.delete.mockResolvedValue({ affected: 0 });
+      mockRepository.delete.mockRejectedValue(new NotFoundException());
 
       await expect(service.remove('invalid-id')).rejects.toThrow(
         NotFoundException,

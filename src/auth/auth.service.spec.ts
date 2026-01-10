@@ -6,36 +6,32 @@ import { TeacherService } from 'src/teacher/teacher.service';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
 
+const mockDbUser = {
+  id: 'db-user-id',
+  auth0_user_id: 'auth0-user-id',
+  auth0_role: 'role-id',
+};
+
+const mockAuth0Service = {
+  getAllRoles: jest.fn(),
+  getRoleById: jest.fn(),
+  getUser: jest.fn(),
+};
+
+const mockUserService = {
+  findOneByAuth0Id: jest.fn(),
+};
+
+const mockStudentService = {
+  findOneByUserId: jest.fn(),
+};
+
+const mockTeacherService = {
+  findOneByUserId: jest.fn(),
+};
+
 describe('AuthService', () => {
   let service: AuthService;
-  let auth0Service: any;
-  let userService: any;
-  let studentService: any;
-  let teacherService: any;
-
-  const mockDbUser = {
-    id: 'db-user-id',
-    auth0_user_id: 'auth0-user-id',
-    auth0_role: 'role-id',
-  };
-
-  const mockAuth0Service = {
-    getAllRoles: jest.fn(),
-    getRoleById: jest.fn(),
-    getUser: jest.fn(),
-  };
-
-  const mockUserService = {
-    findOneByAuth0Id: jest.fn(),
-  };
-
-  const mockStudentService = {
-    findOneByUserId: jest.fn(),
-  };
-
-  const mockTeacherService = {
-    findOneByUserId: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -49,10 +45,6 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    auth0Service = module.get(Auth0Service);
-    userService = module.get(UserService);
-    studentService = module.get(StudentService);
-    teacherService = module.get(TeacherService);
   });
 
   afterEach(() => {
@@ -78,11 +70,13 @@ describe('AuthService', () => {
 
       const result = await service.profile('auth0-sub');
 
-      expect(userService.findOneByAuth0Id).toHaveBeenCalledWith('auth0-sub');
-      expect(auth0Service.getRoleById).toHaveBeenCalledWith(
+      expect(mockUserService.findOneByAuth0Id).toHaveBeenCalledWith(
+        'auth0-sub',
+      );
+      expect(mockAuth0Service.getRoleById).toHaveBeenCalledWith(
         mockDbUser.auth0_role,
       );
-      expect(auth0Service.getUser).toHaveBeenCalledWith(
+      expect(mockAuth0Service.getUser).toHaveBeenCalledWith(
         mockDbUser.auth0_user_id,
       );
       expect(result).toEqual({ ...auth0User, roleName: 'admin' });
@@ -96,7 +90,7 @@ describe('AuthService', () => {
 
       const result = await service.profile('auth0-sub');
 
-      expect(studentService.findOneByUserId).toHaveBeenCalledWith(
+      expect(mockStudentService.findOneByUserId).toHaveBeenCalledWith(
         mockDbUser.id,
       );
       expect(result).toEqual({ ...studentData, roleName: 'student' });
@@ -110,7 +104,7 @@ describe('AuthService', () => {
 
       const result = await service.profile('auth0-sub');
 
-      expect(teacherService.findOneByUserId).toHaveBeenCalledWith(
+      expect(mockTeacherService.findOneByUserId).toHaveBeenCalledWith(
         mockDbUser.id,
       );
       expect(result).toEqual({ ...teacherData, roleName: 'teacher' });

@@ -6,25 +6,28 @@ import { UpdateNoticeDto } from './dto/update-notice.dto';
 import { Notice } from './entities/notice.entity';
 import { NoticeService } from './notice.service';
 
+const mockNotice = {
+  id: 'notice-id',
+  title: 'Notice Title',
+  content: 'Notice Content',
+  createdById: 'user-id',
+  createdAt: new Date(),
+};
+
+const mockRepository = {
+  create: jest.fn(),
+  save: jest.fn(),
+  findAndCount: jest.fn(),
+  findOne: jest.fn(),
+  remove: jest.fn(),
+};
+const createDto: CreateNoticeDto & { createdById: string } = {
+  text: 'text',
+  createdById: 'user-id',
+};
+const updateDto: UpdateNoticeDto = { text: 'Updated Title' };
 describe('NoticeService', () => {
   let service: NoticeService;
-  let repository: any;
-
-  const mockNotice = {
-    id: 'notice-id',
-    title: 'Notice Title',
-    content: 'Notice Content',
-    createdById: 'user-id',
-    createdAt: new Date(),
-  };
-
-  const mockRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    findAndCount: jest.fn(),
-    findOne: jest.fn(),
-    remove: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -38,7 +41,6 @@ describe('NoticeService', () => {
     }).compile();
 
     service = module.get<NoticeService>(NoticeService);
-    repository = module.get(getRepositoryToken(Notice));
   });
 
   afterEach(() => {
@@ -51,18 +53,13 @@ describe('NoticeService', () => {
 
   describe('create', () => {
     it('should create a notice', async () => {
-      const createDto: CreateNoticeDto & { createdById: string } = {
-        text: 'text',
-        createdById: 'user-id',
-      };
-
       mockRepository.create.mockReturnValue(mockNotice);
       mockRepository.save.mockResolvedValue(mockNotice);
 
       const result = await service.create(createDto);
 
-      expect(repository.create).toHaveBeenCalledWith(createDto);
-      expect(repository.save).toHaveBeenCalledWith(mockNotice);
+      expect(mockRepository.create).toHaveBeenCalledWith(createDto);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockNotice);
       expect(result).toEqual(mockNotice);
     });
   });
@@ -76,7 +73,7 @@ describe('NoticeService', () => {
 
       const result = await service.findAll({ limit, offset });
 
-      expect(repository.findAndCount).toHaveBeenCalledWith({
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
         skip: offset,
         take: limit,
         order: { createdAt: 'desc' },
@@ -89,34 +86,43 @@ describe('NoticeService', () => {
     it('should return a notice', async () => {
       mockRepository.findOne.mockResolvedValue(mockNotice);
       const result = await service.findOne('notice-id');
-      expect(repository.findOne).toHaveBeenCalledWith({
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'notice-id' },
       });
       expect(result).toEqual(mockNotice);
     });
 
     it('should throw NotFoundException if not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
       await expect(service.findOne('id')).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('update', () => {
     it('should update a notice', async () => {
-      const updateDto: UpdateNoticeDto = { text: 'Updated Title' };
       mockRepository.findOne.mockResolvedValue(mockNotice);
       const updatedNotice = { ...mockNotice, ...updateDto };
       mockRepository.save.mockResolvedValue(updatedNotice);
 
       const result = await service.update('notice-id', updateDto);
 
-      expect(repository.findOne).toHaveBeenCalledWith({
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'notice-id' },
       });
-      expect(repository.save).toHaveBeenCalledWith(
+      expect(mockRepository.save).toHaveBeenCalledWith(
         expect.objectContaining(updateDto),
       );
       expect(result).toEqual(updatedNotice);
+    });
+    it('should throw NotFoundException if not found', async () => {
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
+      await expect(service.update('id', updateDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 'id' },
+      });
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
   });
 
@@ -127,14 +133,14 @@ describe('NoticeService', () => {
 
       await service.remove('notice-id');
 
-      expect(repository.findOne).toHaveBeenCalledWith({
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'notice-id' },
       });
-      expect(repository.remove).toHaveBeenCalledWith(mockNotice);
+      expect(mockRepository.remove).toHaveBeenCalledWith(mockNotice);
     });
 
     it('should throw NotFoundException if not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+      mockRepository.findOne.mockRejectedValue(new NotFoundException());
       await expect(service.remove('id')).rejects.toThrow(NotFoundException);
     });
   });

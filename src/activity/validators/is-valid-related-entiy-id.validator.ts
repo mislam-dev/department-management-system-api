@@ -24,6 +24,6 @@ export class IsValidRelatedEntityIDConstraint
   }
 
   defaultMessage(): string {
-    return 'studentId must be valid!';
+    return 'relatedEntityId must be valid!';
   }
 }

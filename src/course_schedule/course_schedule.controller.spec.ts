@@ -5,22 +5,34 @@ import { CourseScheduleService } from './course_schedule.service';
 import { CreateCourseScheduleDto } from './dto/create-course_schedule.dto';
 import { UpdateCourseScheduleDto } from './dto/update-course_schedule.dto';
 
+const mockCourseId = 'course-id';
+const mockId = 'schedule-id';
+const mockSchedule = {
+  id: mockId,
+  courseId: mockCourseId,
+  dayOfWeek: 'Monday',
+  startTime: '10:00',
+  endTime: '11:00',
+  roomNo: '101',
+};
+const mockCourseScheduleService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+  findOne: jest.fn(),
+  update: jest.fn(),
+  remove: jest.fn(),
+};
+
+const createDto: CreateCourseScheduleDto = {
+  dayOfWeek: 'Monday',
+  startTime: '10:00',
+  endTime: '11:00',
+  room: '100',
+};
+const updateDto: UpdateCourseScheduleDto = { room: '102' };
+
 describe('CourseScheduleController', () => {
   let controller: CourseScheduleController;
-  let service: any;
-
-  const mockSchedule = {
-    id: 'schedule-id',
-    courseId: 'course-id',
-  };
-
-  const mockCourseScheduleService = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +46,6 @@ describe('CourseScheduleController', () => {
     }).compile();
 
     controller = module.get<CourseScheduleController>(CourseScheduleController);
-    service = module.get<CourseScheduleService>(CourseScheduleService);
   });
 
   afterEach(() => {
@@ -43,18 +54,14 @@ describe('CourseScheduleController', () => {
 
   describe('create', () => {
     it('should create a schedule', async () => {
-      const createDto: CreateCourseScheduleDto = {
-        dayOfWeek: 'Monday',
-        startTime: '10:00',
-        endTime: '11:00',
-        roomNo: '101',
-      };
-
       mockCourseScheduleService.create.mockResolvedValue(mockSchedule);
 
-      const result = await controller.create('course-id', createDto);
+      const result = await controller.create(mockCourseId, createDto);
 
-      expect(service.create).toHaveBeenCalledWith('course-id', createDto);
+      expect(mockCourseScheduleService.create).toHaveBeenCalledWith(
+        mockCourseId,
+        createDto,
+      );
       expect(result).toEqual(mockSchedule);
     });
   });
@@ -70,12 +77,15 @@ describe('CourseScheduleController', () => {
       };
       mockCourseScheduleService.findAll.mockResolvedValue(expected);
 
-      const result = await controller.findAll('course-id', pagination);
+      const result = await controller.findAll(mockCourseId, pagination);
 
-      expect(service.findAll).toHaveBeenCalledWith('course-id', {
-        limit: 10,
-        offset: 0,
-      });
+      expect(mockCourseScheduleService.findAll).toHaveBeenCalledWith(
+        mockCourseId,
+        {
+          limit: 10,
+          offset: 0,
+        },
+      );
       expect(result).toEqual(expected);
     });
   });
@@ -84,20 +94,22 @@ describe('CourseScheduleController', () => {
     it('should return a schedule', async () => {
       mockCourseScheduleService.findOne.mockResolvedValue(mockSchedule);
       const result = await controller.findOne('id');
-      expect(service.findOne).toHaveBeenCalledWith('id');
+      expect(mockCourseScheduleService.findOne).toHaveBeenCalledWith('id');
       expect(result).toEqual(mockSchedule);
     });
   });
 
   describe('update', () => {
     it('should update a schedule', async () => {
-      const updateDto: UpdateCourseScheduleDto = { roomNo: '102' };
       mockCourseScheduleService.update.mockResolvedValue({
         ...mockSchedule,
         ...updateDto,
       });
-      const result = await controller.update('id', updateDto);
-      expect(service.update).toHaveBeenCalledWith('id', updateDto);
+      const result = await controller.update(mockId, updateDto);
+      expect(mockCourseScheduleService.update).toHaveBeenCalledWith(
+        mockId,
+        updateDto,
+      );
       expect(result).toEqual({ ...mockSchedule, ...updateDto });
     });
   });
@@ -105,8 +117,8 @@ describe('CourseScheduleController', () => {
   describe('remove', () => {
     it('should remove a schedule', async () => {
       mockCourseScheduleService.remove.mockResolvedValue(undefined);
-      await controller.remove('id');
-      expect(service.remove).toHaveBeenCalledWith('id');
+      await controller.remove(mockId);
+      expect(mockCourseScheduleService.remove).toHaveBeenCalledWith(mockId);
     });
   });
 });

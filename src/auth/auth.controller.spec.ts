@@ -2,18 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from 'src/user/user.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+const mockAuthService = {
+  roles: jest.fn(),
+  profile: jest.fn(),
+};
 
+const mockUserService = {};
 describe('AuthController', () => {
   let controller: AuthController;
-  let authService: any;
-  let userService: any;
-
-  const mockAuthService = {
-    roles: jest.fn(),
-    profile: jest.fn(),
-  };
-
-  const mockUserService = {};
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,8 +21,6 @@ describe('AuthController', () => {
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
-    authService = module.get(AuthService);
-    userService = module.get(UserService);
   });
 
   afterEach(() => {
@@ -44,15 +38,17 @@ describe('AuthController', () => {
   });
 
   describe('me', () => {
-    it('should return request user', () => {
+    it('should return request user', async () => {
       const req = { user: { sub: 'sub-id' } };
-      const result = controller.me(req as any);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const result = await controller.me(req as unknown as Request);
       expect(result).toEqual(req.user);
     });
 
-    it('should return empty object if user is missing', () => {
+    it('should return empty object if user is missing', async () => {
       const req = {};
-      const result = controller.me(req as any);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const result = await controller.me(req as unknown as Request);
       expect(result).toEqual({});
     });
   });
@@ -63,9 +59,9 @@ describe('AuthController', () => {
       const profile = { name: 'Test' };
       mockAuthService.profile.mockResolvedValue(profile);
 
-      const result = await controller.profile(req as any);
+      const result = await controller.profile(req as unknown as Request);
 
-      expect(authService.profile).toHaveBeenCalledWith('sub-id');
+      expect(mockAuthService.profile).toHaveBeenCalledWith('sub-id');
       expect(result).toEqual(profile);
     });
   });

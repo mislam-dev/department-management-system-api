@@ -1,26 +1,36 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AttendanceController } from './attendance.controller';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { AttendanceStatus } from './entities/attendance.entity';
 
+const mockId = 'attendance-id';
+const mockAttendance = {
+  id: mockId,
+  status: 'present',
+};
+
+const mockAttendanceService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+  findOne: jest.fn(),
+  update: jest.fn(),
+  remove: jest.fn(),
+};
+const createDto: CreateAttendanceDto = {
+  studentId: 'student-id',
+  courseScheduleId: 'schedule-id',
+  status: AttendanceStatus.PRESENT,
+  date: new Date().toString(),
+};
+const updateDto: UpdateAttendanceDto = {
+  status: AttendanceStatus.ABSENT,
+};
 describe('AttendanceController', () => {
   let controller: AttendanceController;
-  let service: any;
-
-  const mockAttendance = {
-    id: 'attendance-id',
-    status: 'present',
-  };
-
-  const mockAttendanceService = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +44,6 @@ describe('AttendanceController', () => {
     }).compile();
 
     controller = module.get<AttendanceController>(AttendanceController);
-    service = module.get<AttendanceService>(AttendanceService);
   });
 
   afterEach(() => {
@@ -43,22 +52,17 @@ describe('AttendanceController', () => {
 
   describe('create', () => {
     it('should create attendance', async () => {
-      const createDto: CreateAttendanceDto = {
-        studentId: 'student-id',
-        courseScheduleId: 'schedule-id',
-        status: 'present',
-      };
       mockAttendanceService.create.mockResolvedValue(mockAttendance);
 
       const result = await controller.create(createDto);
 
-      expect(service.create).toHaveBeenCalledWith(createDto);
+      expect(mockAttendanceService.create).toHaveBeenCalledWith(createDto);
       expect(result).toEqual(mockAttendance);
     });
   });
 
   describe('findAll', () => {
-    it('should return attendance records', async () => {
+    it('should return attendance records with pagination', async () => {
       const query: FindAllQueryDto = {
         limit: 10,
         offset: 0,
@@ -74,7 +78,7 @@ describe('AttendanceController', () => {
 
       const result = await controller.findAll(query);
 
-      expect(service.findAll).toHaveBeenCalledWith(
+      expect(mockAttendanceService.findAll).toHaveBeenCalledWith(
         { limit: 10, offset: 0 },
         'student-id',
       );
@@ -85,30 +89,47 @@ describe('AttendanceController', () => {
   describe('findOne', () => {
     it('should return attendance record', async () => {
       mockAttendanceService.findOne.mockResolvedValue(mockAttendance);
-      const result = await controller.findOne('id');
-      expect(service.findOne).toHaveBeenCalledWith('id');
+      const result = await controller.findOne(mockId);
+      expect(mockAttendanceService.findOne).toHaveBeenCalledWith(mockId);
       expect(result).toEqual(mockAttendance);
+    });
+
+    it('should throw NotFoundException if not found', async () => {
+      mockAttendanceService.findOne.mockRejectedValue(new NotFoundException());
+
+      await expect(controller.findOne('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('update', () => {
     it('should update attendance', async () => {
-      const updateDto: UpdateAttendanceDto = { status: 'absent' };
-      mockAttendanceService.update.mockResolvedValue({
+      const updated = {
         ...mockAttendance,
         ...updateDto,
-      });
-      const result = await controller.update('id', updateDto);
-      expect(service.update).toHaveBeenCalledWith('id', updateDto);
-      expect(result).toEqual({ ...mockAttendance, ...updateDto });
+      };
+      mockAttendanceService.update.mockResolvedValue(updated);
+      const result = await controller.update(mockId, updateDto);
+      expect(mockAttendanceService.update).toHaveBeenCalledWith(
+        mockId,
+        updateDto,
+      );
+      expect(result).toEqual(updated);
     });
   });
 
   describe('remove', () => {
     it('should remove attendance', async () => {
-      mockAttendanceService.remove.mockResolvedValue(undefined);
-      await controller.remove('id');
-      expect(service.remove).toHaveBeenCalledWith('id');
+      mockAttendanceService.remove.mockResolvedValue({ affected: 1 });
+      await controller.remove(mockId);
+      expect(mockAttendanceService.remove).toHaveBeenCalledWith(mockId);
+    });
+    it('should throw NotFoundException if not found', async () => {
+      mockAttendanceService.remove.mockRejectedValue(new NotFoundException());
+      await expect(controller.remove('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

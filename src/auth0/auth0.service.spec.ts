@@ -25,11 +25,10 @@ jest.mock('auth0', () => {
 
 describe('Auth0Service', () => {
   let service: Auth0Service;
-  let configService: ConfigService;
 
   const mockConfigService = {
     get: jest.fn((key: string) => {
-      const config = {
+      const config: Record<string, string> = {
         'auth0_m2m.domain': 'domain',
         'auth0_m2m.clientId': 'id',
         'auth0_m2m.clientSecret': 'secret',
@@ -51,7 +50,6 @@ describe('Auth0Service', () => {
     }).compile();
 
     service = module.get<Auth0Service>(Auth0Service);
-    configService = module.get<ConfigService>(ConfigService);
   });
 
   afterEach(() => {
@@ -74,6 +72,7 @@ describe('Auth0Service', () => {
     const mockList = jest.fn().mockResolvedValue({ data: [] });
     // We need to access the private auth0 property or rely on the mock factory.
     // Let's use `(service as any).auth0`
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (service as any).auth0.users.list = mockList;
 
     await service.getUsers();
@@ -82,6 +81,7 @@ describe('Auth0Service', () => {
 
   it('should get a user', async () => {
     const mockGet = jest.fn().mockResolvedValue({ user_id: '1' });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (service as any).auth0.users.get = mockGet;
 
     await service.getUser('1');
@@ -90,6 +90,7 @@ describe('Auth0Service', () => {
 
   it('should create a user', async () => {
     const mockCreate = jest.fn().mockResolvedValue({ user_id: '1' });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (service as any).auth0.users.create = mockCreate;
 
     const dto = { email: 'test@example.com', password: 'pwd', name: 'test' };
@@ -100,6 +101,7 @@ describe('Auth0Service', () => {
 
   it('should update a user', async () => {
     const mockUpdate = jest.fn().mockResolvedValue({ user_id: '1' });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (service as any).auth0.users.update = mockUpdate;
 
     await service.updateUser('1', { name: 'new' });
@@ -108,6 +110,7 @@ describe('Auth0Service', () => {
 
   it('should delete a user', async () => {
     const mockDelete = jest.fn().mockResolvedValue({});
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (service as any).auth0.users.delete = mockDelete;
 
     await service.deleteUser('1');
@@ -116,6 +119,7 @@ describe('Auth0Service', () => {
 
   it('should list roles', async () => {
     const mockList = jest.fn().mockResolvedValue([]);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (service as any).auth0.roles.list = mockList;
 
     await service.getAllRoles();
@@ -124,6 +128,7 @@ describe('Auth0Service', () => {
 
   it('should get role by id', async () => {
     const mockGet = jest.fn().mockResolvedValue({});
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (service as any).auth0.roles.get = mockGet;
 
     await service.getRoleById('1');

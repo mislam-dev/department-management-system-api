@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaginationDto } from 'src/pagination/pagination.dto';
 import { CourseController } from './course.controller';
@@ -5,24 +6,34 @@ import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 
+const mockId = 'course-id';
+const mockCourse = {
+  id: mockId,
+  name: 'Introduction to Computer Science',
+  code: 'CS101',
+  credit: 3,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const createCourseDto: CreateCourseDto = {
+  name: 'Introduction to Computer Science',
+  code: 'CS101',
+  credits: 3,
+  semesterId: 'semester-id',
+};
+const updateCourseDto: UpdateCourseDto = {
+  name: 'Calculus',
+};
+const mockCourseService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+  findOne: jest.fn(),
+  update: jest.fn(),
+  remove: jest.fn(),
+};
 describe('CourseController', () => {
   let controller: CourseController;
-  let service: any;
-
-  const mockCourse = {
-    id: 'course-id',
-    name: 'Introduction to Computer Science',
-    code: 'CS101',
-    credit: 3,
-  };
-
-  const mockCourseService = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,7 +47,6 @@ describe('CourseController', () => {
     }).compile();
 
     controller = module.get<CourseController>(CourseController);
-    service = module.get<CourseService>(CourseService);
   });
 
   afterEach(() => {
@@ -49,16 +59,11 @@ describe('CourseController', () => {
 
   describe('create', () => {
     it('should create a course', async () => {
-      const createCourseDto: CreateCourseDto = {
-        name: 'Introduction to Computer Science',
-        code: 'CS101',
-        credit: 3,
-      };
       mockCourseService.create.mockResolvedValue(mockCourse);
 
       const result = await controller.create(createCourseDto);
 
-      expect(service.create).toHaveBeenCalledWith(createCourseDto);
+      expect(mockCourseService.create).toHaveBeenCalledWith(createCourseDto);
       expect(result).toEqual(mockCourse);
     });
   });
@@ -76,7 +81,10 @@ describe('CourseController', () => {
 
       const result = await controller.findAll(paginationDto);
 
-      expect(service.findAll).toHaveBeenCalledWith({ limit: 10, offset: 0 });
+      expect(mockCourseService.findAll).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 0,
+      });
       expect(result).toEqual(expectedResult);
     });
   });
@@ -87,14 +95,21 @@ describe('CourseController', () => {
 
       const result = await controller.findOne('course-id');
 
-      expect(service.findOne).toHaveBeenCalledWith('course-id');
+      expect(mockCourseService.findOne).toHaveBeenCalledWith('course-id');
       expect(result).toEqual(mockCourse);
+    });
+
+    it('should throw NotFoundException if course not found', async () => {
+      mockCourseService.findOne.mockRejectedValue(new NotFoundException());
+
+      await expect(controller.findOne('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('update', () => {
     it('should update a course', async () => {
-      const updateCourseDto: UpdateCourseDto = { name: 'Calculus' };
       mockCourseService.update.mockResolvedValue({
         ...mockCourse,
         ...updateCourseDto,
@@ -102,8 +117,23 @@ describe('CourseController', () => {
 
       const result = await controller.update('course-id', updateCourseDto);
 
-      expect(service.update).toHaveBeenCalledWith('course-id', updateCourseDto);
+      expect(mockCourseService.update).toHaveBeenCalledWith(
+        'course-id',
+        updateCourseDto,
+      );
       expect(result).toEqual({ ...mockCourse, ...updateCourseDto });
+    });
+    it('should throw NotFoundException if course not found', async () => {
+      mockCourseService.findOne.mockRejectedValue(new NotFoundException());
+
+      await controller.update('invalid-id', updateCourseDto);
+      await expect(controller.findOne('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockCourseService.update).toHaveBeenCalledWith(
+        'invalid-id',
+        updateCourseDto,
+      );
     });
   });
 
@@ -113,7 +143,7 @@ describe('CourseController', () => {
 
       await controller.remove('course-id');
 
-      expect(service.remove).toHaveBeenCalledWith('course-id');
+      expect(mockCourseService.remove).toHaveBeenCalledWith('course-id');
     });
   });
 });
