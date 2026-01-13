@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { AiService } from 'src/ai/ai.service';
 import { CourseService } from 'src/course/course.service';
 import { CourseScheduleService } from './course_schedule.service';
 import { CreateCourseScheduleDto } from './dto/create-course_schedule.dto';
@@ -51,6 +52,12 @@ describe('CourseScheduleService', () => {
         {
           provide: CourseService,
           useValue: mockCourseService,
+        },
+        {
+          provide: AiService,
+          useValue: {
+            courseScheduleAssistant: jest.fn(),
+          },
         },
       ],
     }).compile();
