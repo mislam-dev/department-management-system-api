@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -23,6 +24,7 @@ import { CourseModule } from './course/course.module';
 import { CourseScheduleModule } from './course_schedule/course_schedule.module';
 import { NoticeModule } from './notice/notice.module';
 import { ReportModule } from './report/report.module';
+import { RoomModule } from './room/room.module';
 import { SeederModule } from './seeder/seeder.module';
 import { SemesterModule } from './semester/semester.module';
 import { StudentModule } from './student/student.module';
@@ -30,8 +32,6 @@ import { TeacherAttendanceModule } from './teacher-attendance/teacher-attendance
 import { TeacherModule } from './teacher/teacher.module';
 import { TeacherUnavailabilityModule } from './teacher_unavailability/teacher_unavailability.module';
 import { UserModule } from './user/user.module';
-import { RoomModule } from './room/room.module';
-
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -53,6 +53,12 @@ import { RoomModule } from './room/room.module';
         autoLoadEntities: true,
         synchronize: true,
       }),
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
     }),
     AuthModule,
     UserModule,
