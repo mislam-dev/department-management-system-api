@@ -1,4 +1,4 @@
-import { User } from '../auth/user.entity'; // or whatever your User type is
+import { User } from '../core/authentication/auth/user.entity'; // or whatever your User type is
 
 declare module 'express-serve-static-core' {
   interface Request {

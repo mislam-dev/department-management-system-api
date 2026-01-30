@@ -4,11 +4,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
-import * as fs from 'fs';
-import * as yaml from 'js-yaml';
 import { AppModule } from './app.module';
+import { setupSwagger } from './core/swagger/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -34,12 +32,7 @@ async function bootstrap() {
   );
 
   // swagger
-  const files = fs.readFileSync('src/swagger/swagger.yaml', 'utf8');
-  const document: OpenAPIObject = yaml.load(files) as OpenAPIObject;
-
-  SwaggerModule.setup('docs', app, document, {
-    customCssUrl: '/swagger-dark.css',
-  });
+  setupSwagger(app);
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 

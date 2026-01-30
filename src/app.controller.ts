@@ -6,9 +6,9 @@ import { Controller, Get, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { AppService } from './app.service';
-import { Public } from './auth/decorators/public.decorator';
-import { SetRolePermissions } from './auth/decorators/set-roles-permissions.decorator';
-import { SetRoles } from './auth/decorators/set-roles.decorator';
+import { Public } from './core/authentication/auth/decorators/public.decorator';
+import { SetRolePermissions } from './core/authentication/auth/decorators/set-roles-permissions.decorator';
+import { SetRoles } from './core/authentication/auth/decorators/set-roles.decorator';
 
 @Controller()
 export class AppController {
