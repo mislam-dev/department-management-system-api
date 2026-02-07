@@ -39,6 +39,8 @@ tags:
     description: Notices and attachments
   - name: Reports
     description: Reports generation
+  - name: Fees
+    description: Fee management
 security:
   - bearerAuth: []
 paths:
@@ -1871,6 +1873,120 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /fee:
+    get:
+      tags: [Fees]
+      summary: List all fees
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+        - name: studentId
+          in: query
+          description: Filter by Student ID
+          schema:
+            type: string
+            format: uuid
+        - name: semesterId
+          in: query
+          description: Filter by Semester ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of fees
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Fee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Fees]
+      summary: Create a new fee
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFeeDto'
+      responses:
+        '201':
+          description: Fee created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /fee/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Fees]
+      summary: Get fee by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Fee details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fee'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Fees]
+      summary: Update fee
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFeeDto'
+      responses:
+        '200':
+          description: Fee updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fee'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Fees]
+      summary: Delete fee
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Fee deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2823,6 +2939,92 @@ components:
         parameters:
           type: string
           default: ''
+    FeeType:
+      type: string
+      enum:
+        [registration, session, certificates, exam_recall, admission, others]
+    FeeStatus:
+      type: string
+      enum: [pending, progress, paid, failed, hold, declined, deleted]
+    Fee:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/FeeType'
+        notes:
+          type: string
+          nullable: true
+        total:
+          type: integer
+        charge:
+          type: integer
+          default: 0
+          nullable: true
+        sub_total:
+          type: integer
+        studentId:
+          type: string
+          format: uuid
+        session:
+          type: string
+        semesterId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/FeeStatus'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateFeeDto:
+      type: object
+      required: [total, sub_total, studentId, semesterId]
+      properties:
+        type:
+          $ref: '#/components/schemas/FeeType'
+        notes:
+          type: string
+        total:
+          type: integer
+        charge:
+          type: integer
+        sub_total:
+          type: integer
+        studentId:
+          type: string
+          format: uuid
+        semesterId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/FeeStatus'
+    UpdateFeeDto:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/FeeType'
+        notes:
+          type: string
+        total:
+          type: integer
+        charge:
+          type: integer
+        sub_total:
+          type: integer
+        studentId:
+          type: string
+          format: uuid
+        semesterId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/FeeStatus'
+
   examples: {}
   responses:
     BadRequest:

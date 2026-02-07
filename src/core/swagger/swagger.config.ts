@@ -6,7 +6,6 @@ import * as path from 'path';
 
 export function setupSwagger(app: INestApplication): void {
   const swaggerFile = path.join(__dirname, 'swagger.yaml');
-
   if (fs.existsSync(swaggerFile)) {
     const files = fs.readFileSync(swaggerFile, 'utf8');
     const document: OpenAPIObject = yaml.load(files) as OpenAPIObject;
