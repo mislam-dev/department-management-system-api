@@ -1,15 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
-import { PaymentApiService } from './payment-api.service';
+import { PaginationDto } from 'src/common/pagination/pagination.dto';
+import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
 import { CreatePaymentApiDto } from './dto/create-payment-api.dto';
 import { UpdatePaymentApiDto } from './dto/update-payment-api.dto';
+import { PaymentApiService } from './payment-api.service';
 
 @Controller('payment-api')
 export class PaymentApiController {
@@ -21,13 +24,20 @@ export class PaymentApiController {
   }
 
   @Get()
-  findAll() {
-    return this.paymentApiService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentApiService.findOne(+id);
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+    @Query('feesId') feesId?: string,
+  ) {
+    const { results, total } = await this.paymentApiService.findAll(
+      paginationDto,
+      feesId,
+    );
+    return {
+      results,
+      total,
+      limit: paginationDto.limit || 10,
+      offset: paginationDto.offset || 0,
+    };
   }
 
   @Patch(':id')
@@ -35,11 +45,12 @@ export class PaymentApiController {
     @Param('id') id: string,
     @Body() updatePaymentApiDto: UpdatePaymentApiDto,
   ) {
-    return this.paymentApiService.update(+id, updatePaymentApiDto);
+    return this.paymentApiService.update(id, updatePaymentApiDto);
   }
 
+  @SetPermissions('payment:delete')
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.paymentApiService.remove(+id);
+    return this.paymentApiService.remove(id);
   }
 }
