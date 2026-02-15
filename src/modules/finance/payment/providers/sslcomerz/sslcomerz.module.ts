@@ -2,6 +2,7 @@ import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 import SSLCommerzPayment from 'sslcommerz-lts';
 import {
   SSLCOMMERZ_CANCEL_URL,
+  SSLCOMMERZ_CONFIG,
   SSLCOMMERZ_FAIL_URL,
   SSLCOMMERZ_INSTANCE,
   SSLCOMMERZ_IPN_URL,
@@ -14,48 +15,89 @@ import { SslcommerzConfig } from './types/config.types';
 @Module({})
 export class SslcomerzModule {
   static register(config: SslcommerzConfig): DynamicModule {
-    const { is_live, store_id, store_password } = config;
-    const sslcz = new SSLCommerzPayment(store_id, store_password, is_live);
-    const provider: Provider = {
-      provide: SSLCOMMERZ_INSTANCE,
-      useValue: sslcz,
-    };
-    const sslConfigValue: Provider[] = [
-      {
-        provide: SSLCOMMERZ_SUCCESS_URL,
-        useValue: config.success_url,
-      },
-      {
-        provide: SSLCOMMERZ_FAIL_URL,
-        useValue: config.failure_url,
-      },
-      {
-        provide: SSLCOMMERZ_CANCEL_URL,
-        useValue: config.cancel_url,
-      },
-      {
-        provide: SSLCOMMERZ_IPN_URL,
-        useValue: config.ipn_url,
-      },
-    ];
     return {
       module: SslcomerzModule,
       providers: [
-        provider,
-        ...sslConfigValue,
-        {
-          provide: SslcomerzStrategy,
-          useClass: SslcomerzStrategy,
-        },
+        { provide: SSLCOMMERZ_CONFIG, useValue: config },
+        this.createSslInstanceProvider(),
+        SslcomerzStrategy,
       ],
-      exports: [
-        provider,
+      exports: [SSLCOMMERZ_INSTANCE, SslcomerzStrategy],
+    };
+  }
+
+  static registerAsync(options: {
+    useFactory: (
+      ...args: any[]
+    ) => Promise<SslcommerzConfig> | SslcommerzConfig;
+    inject?: any[];
+  }): DynamicModule {
+    // 1. Define the main config provider
+    const configProvider: Provider = {
+      provide: SSLCOMMERZ_CONFIG,
+      useFactory: options.useFactory,
+      inject: options.inject || [],
+    };
+
+    // 2. Define the URL providers
+    const sslConfigValue: Provider[] = [
+      {
+        provide: SSLCOMMERZ_SUCCESS_URL,
+        useFactory: (config: SslcommerzConfig) => config.success_url,
+        inject: [SSLCOMMERZ_CONFIG],
+      },
+      {
+        provide: SSLCOMMERZ_FAIL_URL,
+        useFactory: (config: SslcommerzConfig) => config.failure_url,
+        inject: [SSLCOMMERZ_CONFIG],
+      },
+      {
+        provide: SSLCOMMERZ_CANCEL_URL,
+        useFactory: (config: SslcommerzConfig) => config.cancel_url,
+        inject: [SSLCOMMERZ_CONFIG],
+      },
+      {
+        provide: SSLCOMMERZ_IPN_URL,
+        useFactory: (config: SslcommerzConfig) => config.ipn_url,
+        inject: [SSLCOMMERZ_CONFIG],
+      },
+    ];
+
+    const sslInstanceProvider: Provider = {
+      provide: SSLCOMMERZ_INSTANCE,
+      useFactory: (config: SslcommerzConfig) => {
+        return new SSLCommerzPayment(
+          config.store_id,
+          config.store_password,
+          config.is_live,
+        );
+      },
+      inject: [SSLCOMMERZ_CONFIG],
+    };
+
+    return {
+      module: SslcomerzModule,
+      providers: [
+        configProvider,
+        sslInstanceProvider,
         ...sslConfigValue,
-        {
-          provide: SslcomerzStrategy,
-          useClass: SslcomerzStrategy,
-        },
+        SslcomerzStrategy, // Make sure this is just the class reference
       ],
+      exports: [sslInstanceProvider, ...sslConfigValue, SslcomerzStrategy],
+    };
+  }
+
+  private static createSslInstanceProvider(): Provider {
+    return {
+      provide: SSLCOMMERZ_INSTANCE,
+      useFactory: (config: SslcommerzConfig) => {
+        return new SSLCommerzPayment(
+          config.store_id,
+          config.store_password,
+          config.is_live,
+        );
+      },
+      inject: [SSLCOMMERZ_CONFIG],
     };
   }
 }
