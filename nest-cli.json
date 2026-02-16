@@ -6,8 +6,9 @@
     "deleteOutDir": true,
     "assets": [
       {
-        "include": "./src/swagger/**/*",
-        "watchAssets": true
+        "include": "core/swagger/**/*",
+        "watchAssets": true,
+        "outDir": "dist/src"
       }
     ]
   }

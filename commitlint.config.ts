@@ -51,6 +51,7 @@ module.exports = {
         'activity',
         'notice',
         'report',
+        'finance',
       ],
     ],
   },

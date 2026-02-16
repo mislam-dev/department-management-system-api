@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { CoreModule } from './core/core.module';
 import { AcademicModule } from './modules/academic/academic.module';
 import { CoreAttendanceModule } from './modules/attendance/core-attendance.module';
+import { FinanceModule } from './modules/finance/finance.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
 
@@ -26,6 +27,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     IdentityModule,
     CoreAttendanceModule,
     ReportingModule,
+    FinanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
