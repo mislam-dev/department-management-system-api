@@ -11,4 +11,8 @@ export interface PaymentStrategy {
   checkout(amount: number): Promise<string>;
   init(data: InitDataRequest): Promise<{ url: string; tran_id: string }>;
   validate(data: unknown): unknown;
+  handleCallback(
+    data: unknown,
+    paymentService: unknown,
+  ): Promise<{ url: string; tran_id: string }>;
 }

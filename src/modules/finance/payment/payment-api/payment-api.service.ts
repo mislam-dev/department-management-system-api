@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePaymentApiDto } from './dto/create-payment-api.dto';
 import { UpdatePaymentApiDto } from './dto/update-payment-api.dto';
@@ -9,6 +10,7 @@ import { UserService } from 'src/modules/identity/user/user.service';
 import { Repository } from 'typeorm';
 import { FeeService } from '../../fee/fee.service';
 import { PaymentFactory } from '../payment.factory';
+import { SslcommerzCallbackDto } from './dto/sslcommerz-callback.dto';
 import { Payment, PaymentStatus } from './entities/payment-api.entity';
 
 @Injectable()
@@ -38,7 +40,7 @@ export class PaymentApiService {
     if (!user) {
       throw new NotFoundException(`User with ID "${student.userId}" not found`);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     const strategy = this.paymentFactory.getStrategy(provider as any);
     const p = await strategy.init({
       total_amount: fee.sub_total,
@@ -98,5 +100,15 @@ export class PaymentApiService {
     if (result.affected === 0) {
       throw new NotFoundException(`Payment with ID "${id}" not found`);
     }
+  }
+
+  async handleCallback(
+    provider: string,
+    body:
+      | SslcommerzCallbackDto
+      | { rawBody: Buffer<ArrayBufferLike> | undefined; signature: string },
+  ): Promise<{ url: string; tran_id: string }> {
+    const strategy = this.paymentFactory.getStrategy(provider as any);
+    return strategy.handleCallback(body, this);
   }
 }

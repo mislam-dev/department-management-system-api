@@ -1,7 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { customAlphabet } from 'nanoid';
 import SSLCommerzPayment from 'sslcommerz-lts';
 import { PaymentStrategy } from '../../interfaces/payment-strategy/payment-strategy.interface';
+import { SslcommerzCallbackDto } from '../../payment-api/dto/sslcommerz-callback.dto';
+import { PaymentApiService } from '../../payment-api/payment-api.service';
 import {
   SSLCOMMERZ_CANCEL_URL,
   SSLCOMMERZ_FAIL_URL,
@@ -24,7 +35,9 @@ export class SslcomerzStrategy implements PaymentStrategy {
     private readonly cancelUrl: string,
     @Inject(SSLCOMMERZ_IPN_URL)
     private readonly ipnUrl: string,
+    private readonly configService: ConfigService,
   ) {}
+
   private generateTranId(): string {
     const nanoid = customAlphabet('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 15);
     const tran_id = `ORDER_${nanoid()}`;
@@ -55,4 +68,51 @@ export class SslcomerzStrategy implements PaymentStrategy {
     const apiResponse: unknown = await this.sslcommerz.validate(data);
     return apiResponse;
   }
+  async handleCallback(
+    data: SslcommerzCallbackDto,
+    paymentService: PaymentApiService,
+  ): Promise<{ url: string; tran_id: string }> {
+    const handlers: any = {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      valid: this.handleSslcommerzSuccess,
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      failed: this.handleSslcommerzFailed,
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      cancelled: this.handleSslcommerzCancelled,
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      unattempted: this.handleSslcommerzUnattempted,
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    const handler = handlers[data.status] as any;
+    if (!handler) {
+      throw new InternalServerErrorException(
+        `Invalid payment status: ${data.status}`,
+      );
+    }
+    const url = await handler.call(this, data, paymentService);
+    return {
+      url,
+      tran_id: data.tran_id,
+    };
+  }
+
+  async handleSslcommerzSuccess(
+    body: SslcommerzCallbackDto,
+    paymentService: PaymentApiService,
+  ) {}
+
+  async handleSslcommerzFailed(
+    body: SslcommerzCallbackDto,
+    paymentService: PaymentApiService,
+  ) {}
+
+  async handleSslcommerzCancelled(
+    body: SslcommerzCallbackDto,
+    paymentService: PaymentApiService,
+  ) {}
+
+  async handleSslcommerzUnattempted(
+    body: SslcommerzCallbackDto,
+    paymentService: PaymentApiService,
+  ) {}
 }
