@@ -13,8 +13,8 @@ export class ParticipantsController {
   }
 
   @Get()
-  findAll() {
-    return this.participantsService.findAll();
+  findAll(@Param('id') conversationId: string) {
+    return this.participantsService.findAll(conversationId);
   }
 
   @Patch(':id')

@@ -23,6 +23,7 @@ export class ConversationService {
       isRestricted: false,
       type: ConversationType.P2P,
     });
+    await this.conversationRepo.save(conversation);
     await this.participantService.createMany([
       {
         conversationId: conversation.id,
@@ -33,7 +34,7 @@ export class ConversationService {
         userId: createConversationDto.userId,
       },
     ]);
-    return this.conversationRepo.save(conversation);
+    return conversation;
   }
 
   async createGroup(
@@ -59,10 +60,8 @@ export class ConversationService {
     return this.conversationRepo.save(conversation);
   }
 
-  findAll(userId: string) {
-    return this.conversationRepo.find({
-      where: { participants: { userId } },
-    });
+  findAll() {
+    return this.conversationRepo.find({});
   }
 
   async findOne(conversationId: string) {

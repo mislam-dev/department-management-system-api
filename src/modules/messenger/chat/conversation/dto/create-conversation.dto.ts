@@ -1,16 +1,14 @@
-import { Optional } from '@nestjs/common';
-import { IsBoolean, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateConversationDto {
-  @Optional()
+  @IsOptional()
   @IsBoolean()
   isRestricted: boolean;
 
-  @IsNotEmpty()
   @IsUUID()
   memberId: string;
 
-  @Optional()
+  @IsOptional()
   @IsString()
   name: string;
 }

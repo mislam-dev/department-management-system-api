@@ -26,7 +26,7 @@ export class ConversationController {
   ) {
     return this.conversationService.create({
       ...createConversationDto,
-      userId: user.sub,
+      userId: user.userId,
     });
   }
 
@@ -37,13 +37,13 @@ export class ConversationController {
   ) {
     return this.conversationService.createGroup({
       ...createConversationDto,
-      userId: user.sub,
+      userId: user.userId,
     });
   }
 
   @Get()
-  findAll(@User() user: UserPayload) {
-    return this.conversationService.findAll(user.sub);
+  findAll() {
+    return this.conversationService.findAll();
   }
 
   @Get(':id')

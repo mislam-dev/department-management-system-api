@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { Participant } from './entities/participant.entity';
@@ -22,8 +22,8 @@ export class ParticipantsService {
     return this.participantRepo.save(participants);
   }
 
-  findAll() {
-    return this.participantRepo.find();
+  findAll(conversationId: string) {
+    return this.participantRepo.find({ where: { conversationId } });
   }
 
   async findOne(id: string): Promise<Participant> {
@@ -32,6 +32,11 @@ export class ParticipantsService {
       throw new NotFoundException('Participant not found');
     }
     return participant;
+  }
+  async findOneBy(
+    where: FindOptionsWhere<Participant>,
+  ): Promise<Participant | null> {
+    return this.participantRepo.findOne({ where });
   }
 
   async update(id: string, updateParticipantDto: UpdateParticipantDto) {
