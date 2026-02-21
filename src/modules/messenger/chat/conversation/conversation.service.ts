@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateParticipantDto } from '../participants/dto/create-participant.dto';
+import { ParticipantRole } from '../participants/entities/participant.entity';
 import { ParticipantsService } from '../participants/participants.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
+import { CreateGroupConversationDto } from './dto/create-group-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { Conversation, ConversationType } from './entities/conversation.entity';
 
@@ -38,8 +41,7 @@ export class ConversationService {
   }
 
   async createGroup(
-    createConversationDto: CreateConversationDto & {
-      memberId: string;
+    createConversationDto: CreateGroupConversationDto & {
       userId: string;
     },
   ) {
@@ -47,17 +49,21 @@ export class ConversationService {
       isRestricted: false,
       type: ConversationType.GROUP,
     });
-    await this.participantService.createMany([
-      {
+
+    await this.conversationRepo.save(conversation);
+    const participants: CreateParticipantDto[] =
+      createConversationDto.members.map((memberId) => ({
         conversationId: conversation.id,
-        userId: createConversationDto.memberId,
-      },
-      {
-        conversationId: conversation.id,
-        userId: createConversationDto.userId,
-      },
-    ]);
-    return this.conversationRepo.save(conversation);
+        userId: memberId,
+        role: ParticipantRole.MEMBER,
+      }));
+    participants.push({
+      conversationId: conversation.id,
+      userId: createConversationDto.userId,
+      role: ParticipantRole.ADMIN,
+    });
+    await this.participantService.createMany(participants);
+    return conversation;
   }
 
   async findAll(userId: string) {

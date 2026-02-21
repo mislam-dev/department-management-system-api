@@ -13,6 +13,7 @@ import {
 } from 'src/core/authentication/auth/decorators/user.decorator';
 import { ConversationService } from './conversation.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
+import { CreateGroupConversationDto } from './dto/create-group-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 
 @Controller('conversation')
@@ -32,7 +33,7 @@ export class ConversationController {
 
   @Post('/group')
   createGroup(
-    @Body() createConversationDto: CreateConversationDto,
+    @Body() createConversationDto: CreateGroupConversationDto,
     @User() user: UserPayload,
   ) {
     return this.conversationService.createGroup({

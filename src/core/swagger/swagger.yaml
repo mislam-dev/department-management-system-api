@@ -2160,7 +2160,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateConversationDto'
+              $ref: '#/components/schemas/CreateGroupConversationDto'
       responses:
         '201':
           description: Group conversation created
@@ -3575,6 +3575,21 @@ components:
         name:
           type: string
       required: [memberId]
+
+    CreateGroupConversationDto:
+      type: object
+      properties:
+        isRestricted:
+          type: boolean
+          default: false
+        members:
+          type: array
+          items:
+            type: string
+            format: uuid
+        name:
+          type: string
+      required: [members, name]
 
     UpdateConversationDto:
       type: object

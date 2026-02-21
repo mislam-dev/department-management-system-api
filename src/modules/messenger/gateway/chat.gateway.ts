@@ -61,7 +61,6 @@ export class ChatGateway implements OnGatewayConnection {
     )) as UserPayload;
 
     const user = await this.userService.findOneByAuth0Id(payload.sub);
-
     const allConversations = await this.conversationService.findAll(user.id);
     const ids = allConversations.map((conversation) => conversation.id);
     await client.join(ids);
