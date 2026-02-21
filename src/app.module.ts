@@ -10,6 +10,7 @@ import { CoreAttendanceModule } from './modules/attendance/core-attendance.modul
 import { FinanceModule } from './modules/finance/finance.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
+import { MessengerModule } from './modules/messenger/messenger.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     CoreAttendanceModule,
     ReportingModule,
     FinanceModule,
+    MessengerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -52,6 +52,7 @@ module.exports = {
         'notice',
         'report',
         'finance',
+        'messenger',
       ],
     ],
   },
