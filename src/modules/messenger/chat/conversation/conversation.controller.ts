@@ -42,8 +42,8 @@ export class ConversationController {
   }
 
   @Get()
-  findAll() {
-    return this.conversationService.findAll();
+  findAll(@User() user: UserPayload) {
+    return this.conversationService.findAll(user.userId);
   }
 
   @Get(':id')

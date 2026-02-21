@@ -17,6 +17,7 @@ import { Server, Socket } from 'socket.io';
 import { UserPayload } from 'src/core/authentication/auth/decorators/user.decorator';
 import { UserService } from 'src/modules/identity/user/user.service';
 import { ChatService } from '../chat/chat.service';
+import { ConversationService } from '../chat/conversation/conversation.service';
 import { MessageBodyDto } from './dtos/send-messge.dto';
 import { JwtTokenService } from './jwt-token.service';
 import { WebsocketExceptionsFilter } from './web-socket-exception.filter';
@@ -38,6 +39,7 @@ export class ChatGateway implements OnGatewayConnection {
     private readonly chatService: ChatService,
     private readonly jwtTokenService: JwtTokenService,
     private readonly userService: UserService,
+    private readonly conversationService: ConversationService,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -59,6 +61,11 @@ export class ChatGateway implements OnGatewayConnection {
     )) as UserPayload;
 
     const user = await this.userService.findOneByAuth0Id(payload.sub);
+
+    const allConversations = await this.conversationService.findAll(user.id);
+    const ids = allConversations.map((conversation) => conversation.id);
+    await client.join(ids);
+
     client.handshake.auth = { ...payload, userId: user.id };
   }
 

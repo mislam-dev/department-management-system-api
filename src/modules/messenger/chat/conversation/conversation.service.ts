@@ -60,8 +60,11 @@ export class ConversationService {
     return this.conversationRepo.save(conversation);
   }
 
-  findAll() {
-    return this.conversationRepo.find({});
+  async findAll(userId: string) {
+    return this.conversationRepo.find({
+      relations: ['participants'],
+      where: { participants: { userId } },
+    });
   }
 
   async findOne(conversationId: string) {

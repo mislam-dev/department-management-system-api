@@ -1,4 +1,12 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Conversation } from '../../conversation/entities/conversation.entity';
 
 export enum ParticipantRole {
   ADMIN = 'ADMIN',
@@ -26,4 +34,8 @@ export class Participant {
 
   @Column({ type: 'timestamp', nullable: true })
   lastReadAt: Date;
+
+  @ManyToOne(() => Conversation, (conversation) => conversation.participants)
+  @JoinColumn({ name: 'conversationId' })
+  conversation: Conversation;
 }

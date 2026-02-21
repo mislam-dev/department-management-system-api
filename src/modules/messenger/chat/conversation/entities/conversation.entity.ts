@@ -33,6 +33,6 @@ export class Conversation {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => Participant, (participant) => participant.userId)
+  @OneToMany(() => Participant, (participant) => participant.conversation)
   participants: Participant[];
 }
