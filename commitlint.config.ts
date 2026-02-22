@@ -53,6 +53,7 @@ module.exports = {
         'report',
         'finance',
         'messenger',
+        'workspace',
       ],
     ],
   },
