@@ -28,7 +28,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --production --frozen-lockfile 
 
 COPY --from=builder /app/dist ./dist
-COPY src/swagger/swagger.yaml src/swagger/swagger.yaml
+COPY src/core/swagger/swagger.yaml src/core/swagger/swagger.yaml
 
 EXPOSE 3000
 

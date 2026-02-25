@@ -3,21 +3,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    container_name: dms_nestjs
+    container_name: dms-api-production
     ports:
       - 3000:3000
     env_file:
-      - .env
+      - .env.production
     environment:
       NODE_ENV: production
       DB_HOST: postgres_prod
+      BULL_REDIS_HOST: host.docker.internal
     restart: unless-stopped
     depends_on:
       postgres_prod:
         condition: service_healthy
+      redis_prod:
+        condition: service_healthy
+    networks:
+      - dms_default_prod
   postgres_prod:
     image: postgres:16-alpine
-    container_name: dms-database
+    container_name: dms-database-production
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -25,12 +30,36 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - dms_prod_data:/var/lib/postgresql/data
+      - dms_postgres_prod_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - dms_default_prod
+
+  redis_prod:
+    image: redis/redis-stack:latest
+    container_name: dms-redis-production
+    ports:
+      - "6379:6379"
+      - "8002:8001"
+    volumes:
+      - dms_redis_prod_data:/data
+    restart: always
+    networks:
+      - dms_default_prod
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  dms_prod_data:
+  dms_postgres_prod_data:
+  dms_redis_prod_data:
+
+networks:
+  dms_default_prod:
+    driver: bridge
