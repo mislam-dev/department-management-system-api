@@ -12,8 +12,14 @@ services:
       - /app/node_modules
     environment:
       DB_HOST: postgres
+      BULL_REDIS_HOST: host.docker.internal
     restart: unless-stopped
     command: pnpm start:dev
+    networks:
+      - dms_default
+    depends_on:
+      - postgres
+      - redis
   postgres:
     image: postgres:16-alpine
     container_name: dms-database
@@ -30,6 +36,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - dms_default
 
   redis:
     image: redis/redis-stack:latest
@@ -40,7 +48,13 @@ services:
     volumes:
       - dms_redis_data:/data
     restart: always
+    networks:
+      - dms_default
 
 volumes:
   dms_data:
   dms_redis_data:
+
+networks:
+  dms_default:
+    driver: bridge
