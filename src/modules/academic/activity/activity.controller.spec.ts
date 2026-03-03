@@ -1,4 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ActivityController } from './activity.controller';
 import { ActivityService } from './activity.service';
@@ -22,6 +23,13 @@ const mockActivityService = {
   update: jest.fn(),
   remove: jest.fn(),
 };
+
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('ActivityController', () => {
   let controller: ActivityController;
 
@@ -29,6 +37,10 @@ describe('ActivityController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ActivityController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: ActivityService,
           useValue: mockActivityService,

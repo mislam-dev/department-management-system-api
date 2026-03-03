@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -7,14 +8,18 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 
 @Controller('activity')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheTTL(1000 * 60 * 15) // 15 minutes
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 

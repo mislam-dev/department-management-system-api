@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 import { CreateTeacherUnavailabilityDto } from './dto/create-teacher_unavailability.dto';
@@ -5,6 +6,12 @@ import { UpdateTeacherUnavailabilityDto } from './dto/update-teacher_unavailabil
 import { TeacherUnavailabilityController } from './teacher_unavailability.controller';
 import { TeacherUnavailabilityService } from './teacher_unavailability.service';
 
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('TeacherUnavailabilityController', () => {
   let controller: TeacherUnavailabilityController;
   let service: Record<string, jest.Mock>;
@@ -26,6 +33,10 @@ describe('TeacherUnavailabilityController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TeacherUnavailabilityController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: TeacherUnavailabilityService,
           useValue: mockTeacherUnavailabilityService,

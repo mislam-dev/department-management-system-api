@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -7,14 +8,18 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { TeacherService } from './teacher.service';
 
 @Controller('teacher')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheTTL(1000 * 60 * 60 * 24 * 45) // 45 days
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 

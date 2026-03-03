@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AttendanceController } from './attendance.controller';
@@ -20,6 +21,12 @@ const mockAttendanceService = {
   update: jest.fn(),
   remove: jest.fn(),
 };
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 const createDto: CreateAttendanceDto = {
   studentId: 'student-id',
   courseScheduleId: 'schedule-id',
@@ -36,6 +43,10 @@ describe('AttendanceController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AttendanceController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: AttendanceService,
           useValue: mockAttendanceService,

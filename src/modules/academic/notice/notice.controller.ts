@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -7,18 +8,22 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
 import {
   User,
   type UserPayload,
 } from 'src/core/authentication/auth/decorators/user.decorator';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CreateNoticeDto } from './dto/create-notice.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { UpdateNoticeDto } from './dto/update-notice.dto';
 import { NoticeService } from './notice.service';
 
 @Controller('notice')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheTTL(1000 * 60 * 60 * 12) // 14 days
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 

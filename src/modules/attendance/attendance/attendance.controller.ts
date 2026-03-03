@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -7,14 +8,18 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 
 @Controller('attendance')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheTTL(1000 * 60 * 15) // 14 days
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 

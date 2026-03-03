@@ -1,7 +1,14 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FeeController } from './fee.controller';
 import { FeeService } from './fee.service';
 
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('FeeController', () => {
   let controller: FeeController;
 
@@ -17,6 +24,10 @@ describe('FeeController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FeeController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: FeeService,
           useValue: mockFeeService,

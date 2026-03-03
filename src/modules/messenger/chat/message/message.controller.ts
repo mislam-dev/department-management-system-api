@@ -1,7 +1,17 @@
-import { Controller, Delete, Get, Param } from '@nestjs/common';
+import { CacheTTL } from '@nestjs/cache-manager';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  UseInterceptors,
+} from '@nestjs/common';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { MessageService } from './message.service';
 
 @Controller('conversations/:conversationId/messages')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheTTL(1000 * 60 * 15) // 15 minutes
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 

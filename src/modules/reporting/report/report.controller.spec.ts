@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserPayload } from 'src/core/authentication/auth/decorators/user.decorator';
 import { CreateReportDto } from './dto/create-report.dto';
@@ -6,6 +7,12 @@ import { ReportType } from './entities/report.entity';
 import { ReportController } from './report.controller';
 import { ReportService } from './report.service';
 
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('ReportController', () => {
   let controller: ReportController;
   let service: Record<string, jest.Mock>;
@@ -24,6 +31,10 @@ describe('ReportController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ReportController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: ReportService,
           useValue: mockReportService,

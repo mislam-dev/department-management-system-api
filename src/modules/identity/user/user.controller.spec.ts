@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
@@ -5,6 +6,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('UserController', () => {
   let controller: UserController;
   let service: Record<string, jest.Mock>;
@@ -27,6 +34,10 @@ describe('UserController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: UserService,
           useValue: mockUserService,

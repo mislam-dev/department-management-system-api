@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -7,14 +8,18 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
+@CacheTTL(1000 * 60 * 60)
+@UseInterceptors(HttpCacheInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -32,6 +37,7 @@ export class UserController {
       offset: pagination.offset || 0,
     });
   }
+
   @SetPermissions('users:read')
   @Get(':id')
   findOne(@Param('id') id: string) {

@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -7,14 +8,18 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CourseScheduleService } from './course_schedule.service';
 import { CreateCourseScheduleDto } from './dto/create-course_schedule.dto';
 import { UpdateCourseScheduleDto } from './dto/update-course_schedule.dto';
 
 @Controller('course/:courseId/schedule')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheTTL(1000 * 60 * 60 * 24 * 30 * 6) // 6 months
 export class CourseScheduleController {
   constructor(private readonly courseScheduleService: CourseScheduleService) {}
 

@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -6,14 +7,18 @@ import {
   Param,
   Patch,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Public } from 'src/core/authentication/auth/decorators/public.decorator';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CreateSemesterDto } from './dto/create-semester.dto';
 import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { SemesterService } from './semester.service';
 
 @Controller('semester')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheTTL(1000 * 60 * 60 * 24 * 30 * 6) // 6 months
 export class SemesterController {
   constructor(private readonly semesterService: SemesterService) {}
 

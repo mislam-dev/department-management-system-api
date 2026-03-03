@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -8,13 +9,17 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
+import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { PaginationDto } from '../../../common/pagination/pagination.dto';
 import { CreateFeeDto } from './dto/create-fee.dto';
 import { UpdateFeeDto } from './dto/update-fee.dto';
 import { FeeService } from './fee.service';
 
 @Controller('fee')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheTTL(1000 * 60 * 60 * 12) // 14 days
 export class FeeController {
   constructor(private readonly feeService: FeeService) {}
 
