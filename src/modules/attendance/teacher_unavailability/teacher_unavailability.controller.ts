@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -16,6 +17,7 @@ import { UpdateTeacherUnavailabilityDto } from './dto/update-teacher_unavailabil
 import { TeacherUnavailabilityService } from './teacher_unavailability.service';
 
 @Controller('teacher/:teacherId/unavailability')
+@CacheTTL(1000 * 60 * 30) // 30 days
 export class TeacherUnavailabilityController {
   constructor(
     private readonly teacherUnavailabilityService: TeacherUnavailabilityService,

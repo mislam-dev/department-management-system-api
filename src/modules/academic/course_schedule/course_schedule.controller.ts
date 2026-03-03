@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -15,6 +16,7 @@ import { CreateCourseScheduleDto } from './dto/create-course_schedule.dto';
 import { UpdateCourseScheduleDto } from './dto/update-course_schedule.dto';
 
 @Controller('course/:courseId/schedule')
+@CacheTTL(1000 * 60 * 60 * 24 * 30 * 6) // 6 months
 export class CourseScheduleController {
   constructor(private readonly courseScheduleService: CourseScheduleService) {}
 

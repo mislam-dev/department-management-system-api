@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -15,6 +16,7 @@ import { UpdateFeeDto } from './dto/update-fee.dto';
 import { FeeService } from './fee.service';
 
 @Controller('fee')
+@CacheTTL(1000 * 60 * 60 * 12) // 14 days
 export class FeeController {
   constructor(private readonly feeService: FeeService) {}
 

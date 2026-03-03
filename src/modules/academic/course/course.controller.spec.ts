@@ -1,4 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 import { CourseController } from './course.controller';
@@ -32,6 +33,13 @@ const mockCourseService = {
   update: jest.fn(),
   remove: jest.fn(),
 };
+
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('CourseController', () => {
   let controller: CourseController;
 
@@ -39,6 +47,10 @@ describe('CourseController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CourseController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: CourseService,
           useValue: mockCourseService,

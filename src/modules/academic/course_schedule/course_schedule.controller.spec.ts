@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 import { CourseScheduleController } from './course_schedule.controller';
@@ -31,6 +32,12 @@ const createDto: CreateCourseScheduleDto = {
 };
 const updateDto: UpdateCourseScheduleDto = { room: '102' };
 
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('CourseScheduleController', () => {
   let controller: CourseScheduleController;
 
@@ -38,6 +45,10 @@ describe('CourseScheduleController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CourseScheduleController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: CourseScheduleService,
           useValue: mockCourseScheduleService,

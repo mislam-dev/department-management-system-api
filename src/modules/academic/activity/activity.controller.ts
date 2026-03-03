@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -15,6 +16,7 @@ import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 
 @Controller('activity')
+@CacheTTL(1000 * 60 * 15) // 15 minutes
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 

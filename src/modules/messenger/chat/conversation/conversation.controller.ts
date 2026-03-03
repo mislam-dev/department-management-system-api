@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -17,6 +18,7 @@ import { CreateGroupConversationDto } from './dto/create-group-conversation.dto'
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 
 @Controller('conversation')
+@CacheTTL(1000 * 60 * 15) // 15 minutes
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
 

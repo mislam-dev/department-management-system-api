@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateNoticeDto } from './dto/create-notice.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
@@ -26,6 +27,12 @@ const createDto: CreateNoticeDto & { createdById: string } = {
 };
 const updateDto: UpdateNoticeDto = { text: 'Updated Title' };
 
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('NoticeController', () => {
   let controller: NoticeController;
 
@@ -33,6 +40,10 @@ describe('NoticeController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [NoticeController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: NoticeService,
           useValue: mockService,

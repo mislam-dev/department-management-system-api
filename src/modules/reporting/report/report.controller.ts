@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
 import {
@@ -9,6 +10,7 @@ import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { ReportService } from './report.service';
 
 @Controller('report')
+@CacheTTL(1000 * 60 * 60 * 24 * 30) // 30 days
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 

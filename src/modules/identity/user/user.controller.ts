@@ -1,3 +1,4 @@
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -15,6 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
+@CacheTTL(1000 * 60 * 60)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -32,6 +34,7 @@ export class UserController {
       offset: pagination.offset || 0,
     });
   }
+
   @SetPermissions('users:read')
   @Get(':id')
   findOne(@Param('id') id: string) {

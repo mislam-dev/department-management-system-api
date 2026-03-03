@@ -1,4 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test } from '@nestjs/testing';
 import { CreateSemesterDto } from './dto/create-semester.dto';
 import { UpdateSemesterDto } from './dto/update-semester.dto';
@@ -24,6 +25,12 @@ const mockSemesterService = {
 const mockCreateDto: CreateSemesterDto = { name: 'Fall 2023' };
 const mockUpdateDto: UpdateSemesterDto = { name: 'Spring 2024' };
 
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('SemesterController', () => {
   let controller: SemesterController;
   let service: SemesterService;
@@ -32,6 +39,10 @@ describe('SemesterController', () => {
     const module = await Test.createTestingModule({
       controllers: [SemesterController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: SemesterService,
           useValue: mockSemesterService,

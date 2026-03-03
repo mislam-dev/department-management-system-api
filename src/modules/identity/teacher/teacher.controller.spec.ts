@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 import { Designation } from 'src/modules/identity/user/entities/user.entity';
@@ -6,6 +7,12 @@ import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { TeacherController } from './teacher.controller';
 import { TeacherService } from './teacher.service';
 
+const mockCacheManager = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
+};
 describe('TeacherController', () => {
   let controller: TeacherController;
   let service: Record<string, jest.Mock>;
@@ -27,6 +34,10 @@ describe('TeacherController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TeacherController],
       providers: [
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
         {
           provide: TeacherService,
           useValue: mockTeacherService,

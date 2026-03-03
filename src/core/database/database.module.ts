@@ -1,7 +1,11 @@
-import { Module } from '@nestjs/common';
+import KeyvRedis from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheService } from '../cache/cache.service';
 
+@Global()
 @Module({
   imports: [
     ConfigModule,
@@ -18,6 +22,24 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         synchronize: true,
       }),
     }),
+    CacheModule.registerAsync({
+      useFactory: (config: ConfigService) => {
+        return {
+          stores: [
+            new KeyvRedis(
+              `redis://${config.getOrThrow<string>('cache_redis.host')}:${config.getOrThrow<number>('cache_redis.port')}`,
+            ),
+          ],
+          isGlobal: true,
+          ttl: 60 * 60 * 24 * 1, // 1 day
+          max: 1000, // 1000 items
+          namespace: config.get<string>('cache_redis.namespace') || 'dms_api',
+        };
+      },
+      inject: [ConfigService],
+    }),
   ],
+  providers: [CacheService],
+  exports: [CacheModule, CacheService],
 })
 export class DatabaseModule {}
