@@ -8,17 +8,14 @@ import {
   Patch,
   Post,
   Query,
-  UseInterceptors,
 } from '@nestjs/common';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
-import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentService } from './student.service';
 
 @Controller('student')
-@UseInterceptors(HttpCacheInterceptor)
 @CacheTTL(1000 * 60 * 60 * 24 * 14) // 14 days
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}

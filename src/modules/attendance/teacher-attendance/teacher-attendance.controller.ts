@@ -8,7 +8,6 @@ import {
   Patch,
   Post,
   Query,
-  UseInterceptors,
 } from '@nestjs/common';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
@@ -16,13 +15,11 @@ import {
   User,
   type UserPayload,
 } from 'src/core/authentication/auth/decorators/user.decorator';
-import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CreateTeacherAttendanceDto } from './dto/create-teacher-attendance.dto';
 import { UpdateTeacherAttendanceDto } from './dto/update-teacher-attendance.dto';
 import { TeacherAttendanceService } from './teacher-attendance.service';
 
 @Controller('teacher/:teacherId/attendance')
-@UseInterceptors(HttpCacheInterceptor)
 @CacheTTL(1000 * 60 * 15) // 15 minutes
 export class TeacherAttendanceController {
   constructor(

@@ -1,24 +1,15 @@
 import { CacheTTL } from '@nestjs/cache-manager';
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
 import {
   User,
   type UserPayload,
 } from 'src/core/authentication/auth/decorators/user.decorator';
-import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CreateReportDto } from './dto/create-report.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { ReportService } from './report.service';
 
 @Controller('report')
-@UseInterceptors(HttpCacheInterceptor)
 @CacheTTL(1000 * 60 * 60 * 24 * 30) // 30 days
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}

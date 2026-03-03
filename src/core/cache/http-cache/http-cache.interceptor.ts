@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { CACHE_KEY_METADATA, CacheInterceptor } from '@nestjs/cache-manager';
 import { ExecutionContext, Injectable } from '@nestjs/common';
+import { CacheService } from '../cache.service';
 
 @Injectable()
 export class HttpCacheInterceptor extends CacheInterceptor {
@@ -25,19 +26,8 @@ export class HttpCacheInterceptor extends CacheInterceptor {
 
     const url: string = httpAdapter.getRequestUrl(request);
 
-    const [path, queryString] = url.split('?');
+    const key = CacheService.generateKey(url);
 
-    const cleanPath = path.replace(/^\/|\/$/g, '').replace(/\//g, ':');
-
-    // 2. Predictable Query: Sort the keys so order doesn't matter
-    let cleanQuery = '';
-    if (queryString) {
-      const params = new URLSearchParams(queryString);
-      params.sort(); // <-- This is the secret sauce
-      cleanQuery =
-        '-' + params.toString().replace(/&/g, '-').replace(/=/g, ':');
-    }
-
-    return `${cleanPath}${cleanQuery}`;
+    return key;
   }
 }

@@ -8,18 +8,15 @@ import {
   Patch,
   Post,
   Query,
-  UseInterceptors,
 } from '@nestjs/common';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 import { SetPermissions } from 'src/core/authentication/auth/decorators/set-permissions.decorator';
-import { HttpCacheInterceptor } from 'src/core/cache/http-cache/http-cache.interceptor';
 import { CreateTeacherUnavailabilityDto } from './dto/create-teacher_unavailability.dto';
 import { ResourceParamDto } from './dto/resource-query.dto';
 import { UpdateTeacherUnavailabilityDto } from './dto/update-teacher_unavailability.dto';
 import { TeacherUnavailabilityService } from './teacher_unavailability.service';
 
 @Controller('teacher/:teacherId/unavailability')
-@UseInterceptors(HttpCacheInterceptor)
 @CacheTTL(1000 * 60 * 30) // 30 days
 export class TeacherUnavailabilityController {
   constructor(
