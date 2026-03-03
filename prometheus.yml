@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s # How often to check for new data
+
+scrape_configs:
+  - job_name: 'nestjs-app'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['api:3000'] # 'app' is the service name from docker-compose

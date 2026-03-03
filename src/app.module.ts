@@ -2,6 +2,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -17,6 +18,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
+      exclude: ['/metrics*'],
     }),
     CoreModule,
     BullModule.forRootAsync({
@@ -34,6 +36,9 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     ReportingModule,
     FinanceModule,
     MessengerModule,
+    PrometheusModule.register({
+      path: '/metrics',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

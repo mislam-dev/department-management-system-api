@@ -10,7 +10,7 @@ import { setupSwagger } from './core/swagger/swagger.config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
-    logger: ['error', 'warn', 'debug'],
+    // logger: ['error', 'warn', 'debug'],
   });
 
   app.useGlobalPipes(

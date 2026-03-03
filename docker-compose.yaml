@@ -12,7 +12,8 @@ services:
       - /app/node_modules
     environment:
       DB_HOST: postgres
-      BULL_REDIS_HOST: host.docker.internal
+      BULL_REDIS_HOST: redis
+      CACHE_REDIS_HOST: redis
     restart: unless-stopped
     command: pnpm start:dev
     networks:
@@ -51,9 +52,34 @@ services:
     networks:
       - dms_default
 
+  # Prometheus: The Data Collector
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus # <--- Persists your metrics history
+    ports:
+      - "9090:9090"
+    networks:
+      - dms_default
+
+  # Grafana: The Visualizer
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000" # Access at localhost:3001
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana # <--- This persists your dashboards
+    networks:
+      - dms_default
+
 volumes:
   dms_data:
   dms_redis_data:
+  grafana-storage:
+  prometheus-data:
 
 networks:
   dms_default:

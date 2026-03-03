@@ -9,6 +9,11 @@ export class HttpCacheInterceptor extends CacheInterceptor {
   trackBy(context: ExecutionContext): string | undefined {
     const request = context.switchToHttp().getRequest();
     const { httpAdapter } = this.httpAdapterHost;
+    const url: string = httpAdapter.getRequestUrl(request);
+
+    if (url.startsWith('/metrics')) {
+      return undefined;
+    }
 
     const requestMethod = httpAdapter.getRequestMethod(request);
     if (requestMethod !== 'GET') {
@@ -23,8 +28,6 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     if (cacheMetadata) {
       return cacheMetadata;
     }
-
-    const url: string = httpAdapter.getRequestUrl(request);
 
     const key = CacheService.generateKey(url);
 
