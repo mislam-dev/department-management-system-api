@@ -4,9 +4,6 @@ module.exports = {
     // Require a commit type
     'type-empty': [2, 'never'],
 
-    // Require a commit scope
-    'scope-empty': [2, 'never'],
-
     'type-enum': [
       2,
       'always',
@@ -22,38 +19,6 @@ module.exports = {
         'build',
         'ci',
         'revert',
-      ],
-    ],
-
-    'scope-enum': [
-      2,
-      'always',
-      [
-        'users',
-        'student',
-        'course',
-        'course-schedule',
-        'attendance',
-        'auth',
-        'user',
-        'room',
-        'teacher',
-        'teacher-attendance',
-        'staff',
-        'semester',
-        'config',
-        'chore',
-        'logging',
-        'security',
-        'testing',
-        'notifications',
-        'uploads',
-        'activity',
-        'notice',
-        'report',
-        'finance',
-        'messenger',
-        'workspace',
       ],
     ],
   },
