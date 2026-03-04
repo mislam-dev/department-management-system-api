@@ -5,12 +5,13 @@ import {
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { logger } from './core/logger/logger.config';
 import { setupSwagger } from './core/swagger/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
-    // logger: ['error', 'warn', 'debug'],
+    logger: logger,
   });
 
   app.useGlobalPipes(
