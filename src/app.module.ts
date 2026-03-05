@@ -1,7 +1,9 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { join } from 'path';
 import { AppController } from './app.controller';
@@ -16,9 +18,10 @@ import { ReportingModule } from './modules/reporting/reporting.module';
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
-      exclude: ['/metrics*'],
+      exclude: ['/metrics'],
     }),
     CoreModule,
     BullModule.forRootAsync({
@@ -41,6 +44,12 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}

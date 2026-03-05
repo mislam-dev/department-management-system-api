@@ -1,3 +1,7 @@
+import './monitoring/sentry/instrument';
+// Prevent VS Code Organize Imports from moving the above import to the bottom
+void 0;
+
 import {
   BadRequestException,
   ValidationError,
