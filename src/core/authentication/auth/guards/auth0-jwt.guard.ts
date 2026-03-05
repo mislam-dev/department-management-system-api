@@ -1,6 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
@@ -16,8 +17,10 @@ export class Auth0JWTGuard extends AuthGuard('jwt') {
       context.getHandler(),
       context.getClass(),
     ]);
-
-    if (isPublic) return true;
+    const request: Request = context.switchToHttp().getRequest();
+    const allowedUrl = ['/metrics/', '/health', '/'];
+    const isAllowed = allowedUrl.some((url) => request.url.startsWith(url));
+    if (isPublic || isAllowed) return true;
 
     return super.canActivate(context);
   }
