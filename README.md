@@ -1,3 +1,85 @@
+# 🚀 What's New
+
+This major release introduces several months of development, bringing powerful new features including AI-driven scheduling, real-time communication, and comprehensive payment gateways. Under the hood, we've completely overhauled our observability stack and optimized performance with advanced caching mechanisms.
+
+## ✨ New Features
+
+### Core Management & Academic Tools
+
+- **AI Course Scheduler:** Introduced an AI Agent for dynamic, conflict-free course schedule generation. Processing is handled via background jobs to ensure a smooth user experience.
+- **Teacher Management:** Added comprehensive tracking for Teacher Attendance and specific Unavailability periods.
+- **Room Management:** New module to manage and allocate physical spaces across Classrooms, Labs, and Offices.
+- **Fee Management:** Added a dedicated module to track, manage, and process student fees effectively.
+
+### Payments & Integrations
+
+- **Multi-Gateway Payment System:** Built a robust payment gateway supporting multiple providers.
+- **Provider Integrations:** Successfully integrated **Stripe** and **SSLCommerz** for secure and seamless transactions.
+
+### Real-Time Communication
+
+- **WebSocket Messenger:** Launched a fully functional real-time chat application.
+- **Chat Features:** Supports one-to-one messaging, group chats, and an exclusive admin-only broadcast/chat feature.
+
+### Performance Optimizations
+
+- **Redis Caching Engine:** Introduced Redis for application-wide caching.
+- **Global Interceptors:** Implemented global interceptors to seamlessly handle caching and automated cache invalidation, significantly reducing database load.
+
+---
+
+## 🛠 Chores, DX, & Technical Debt
+
+### Architecture & Developer Experience (DX)
+
+- **Module Restructuring:** Completely reorganized the codebase, grouping modules logically by functionality and domain for better scalability.
+- **Commitlint:** Enforced standard commit conventions across the repository.
+- **Husky Pre-commit Hooks:** Integrated Husky to automatically run and pass test cases strictly on staged files before allowing commits, ensuring code stability.
+
+### Observability, Logging, & Tracing
+
+- **Default Logger:** Replaced the standard logger with **Winston**, supporting advanced file and console logging out of the box.
+- **Full Monitoring Stack:** Added a complete infrastructure monitoring solution using **Loki, Promtail, Prometheus, and Grafana**.
+- **Error Tracking:** Integrated **Sentry** for real-time error tracing, alerting, and debugging.
+
+## New Tools & Technologies Introduced
+
+This document outlines the new tools, frameworks, services, and integrations added to the Department Management System (DMS) during the latest development cycle.
+
+### 🤖 Artificial Intelligence
+
+- **Google Generative AI:** Integrated to power the new AI Agent responsible for dynamic, conflict-free course schedule generation.
+
+### 💳 Finance & Payments
+
+- **Stripe:** Integrated as a primary payment gateway for secure, reliable fee processing.
+- **SSLCommerz:** Added to support localized, multi-channel payment processing for student fees.
+
+### ⚡ Performance, Caching & Background Jobs
+
+- **Redis:** Implemented as the core caching engine (utilizing global interceptors) to significantly reduce database load and improve response times.
+- **BullMQ:** Utilized alongside Redis to handle robust background job processing, specifically to manage heavy tasks like AI schedule generation without blocking the main event loop.
+
+### 💬 Real-Time Communication
+
+- **WebSockets / Socket.IO:** Added to facilitate real-time, bidirectional communication for the newly introduced Messenger module, supporting one-to-one, group, and admin-only broadcasts.
+
+### 📊 Observability, Logging & Tracing
+
+- **Winston:** Replaced the default NestJS logger to provide advanced, customizable file and console logging capabilities.
+- **Prometheus & Grafana:** Integrated to collect, monitor, and visualize application metrics and infrastructure health.
+- **Loki & Promtail:** Added to securely aggregate and query logs effectively across the containerized application environment.
+- **Sentry:** Implemented for real-time application error tracking, alerting, and debugging.
+
+### 🛠 Developer Experience (DX) & Code Quality
+
+- **Husky:** Introduced as a Git hook tool to automatically enforce pre-commit checks, ensuring test cases run successfully on staged files before allowing a commit.
+- **Commitlint:** Added to strictly enforce standardized commit message formatting across the repository.
+
+---
+
+---
+
 # DMS (NestJS) — Project Overview
 
 Department Management System (DMS) — a modular NestJS API for managing users, academic operations, attendance, finance, messaging, and reporting. The project integrates with Auth0 for authentication and role management, exposes a Swagger/OpenAPI UI, and is designed for containerized deployment.
