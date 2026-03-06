@@ -16,7 +16,7 @@ services:
       BULL_REDIS_HOST: redis
       CACHE_REDIS_HOST: redis
     restart: unless-stopped
-    command: pnpm start:dev
+    command: pnpm start:dev dms
     networks:
       - dms_default
     depends_on:
@@ -46,7 +46,7 @@ services:
     container_name: dms-redis
     ports:
       - "6379:6379"
-      - "8002:8001"
+      - "4000:8001"
     volumes:
       - dms_redis_data:/data
     restart: always
@@ -60,7 +60,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus # <--- Persists your metrics history
     ports:
-      - "9090:9090"
+      - "4001:9090"
     networks:
       - dms_default
 
@@ -68,7 +68,7 @@ services:
   grafana:
     image: grafana/grafana
     ports:
-      - "3001:3000" # Access at localhost:3001
+      - "4002:3000" # Access at localhost:4002
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
@@ -79,7 +79,7 @@ services:
   loki:
     image: grafana/loki:latest
     ports:
-      - "3200:3100"
+      - "4003:3100"
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./loki-data:/loki

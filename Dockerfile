@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD [ "pnpm", "start:dev" ]
+CMD [ "pnpm", "start:dev", "dms" ]
