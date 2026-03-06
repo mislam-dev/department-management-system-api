@@ -25,6 +25,13 @@
       "./node_modules/@types",
       "./src/types"
     ],
-    "paths": {}
+    "paths": {
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
+      ]
+    }
   }
 }
