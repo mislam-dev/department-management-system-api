@@ -11,7 +11,8 @@ services:
     environment:
       NODE_ENV: production
       DB_HOST: postgres_prod
-      BULL_REDIS_HOST: host.docker.internal
+      BULL_REDIS_HOST: redis_prod
+      CACHE_REDIS_HOST: redis_prod
     restart: unless-stopped
     depends_on:
       postgres_prod:
@@ -56,9 +57,55 @@ services:
       timeout: 5s
       retries: 5
 
+  # Prometheus: The Data Collector
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - dms-prometheus-prod-data:/prometheus # <--- Persists your metrics history
+    ports:
+      - "9090:9090"
+    networks:
+      - dms_default_prod
+
+  # Grafana: The Visualizer
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000" # Access at localhost:3001
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - dms-grafana-prod-data:/var/lib/grafana # <--- This persists your dashboards
+    networks:
+      - dms_default_prod
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3200:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-data:/loki
+    networks:
+      - dms_default_prod
+
+  promtail:
+    image: grafana/promtail:latest
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - dms_default_prod
+
 volumes:
   dms_postgres_prod_data:
   dms_redis_prod_data:
+  dms-prometheus-prod-data:
+  dms-grafana-prod-data:
 
 networks:
   dms_default_prod:
