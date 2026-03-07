@@ -1,3 +1,6 @@
+include:
+  - path: "./docker/monitoring.yaml"
+  - path: "./docker/kong/kong-docker.yaml"
 services:
   api:
     build:
@@ -5,13 +8,14 @@ services:
       dockerfile: Dockerfile
     container_name: dms_api
     ports:
-      - 3000:3000
+      - 3001:3000
     env_file: .env
     volumes:
       - .:/app
       - ./node_modules:/app/node_modules
       - ./logs:/app/logs
     environment:
+      PORT: 3000
       DB_HOST: postgres
       BULL_REDIS_HOST: redis
       CACHE_REDIS_HOST: redis
@@ -53,55 +57,31 @@ services:
     networks:
       - dms_default
 
-  # Prometheus: The Data Collector
-  prometheus:
-    image: prom/prometheus
+  auth_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - 3002:3000
+    env_file: ./apps/auth-service/.env
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus # <--- Persists your metrics history
-    ports:
-      - "4001:9090"
-    networks:
-      - dms_default
-
-  # Grafana: The Visualizer
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "4002:3000" # Access at localhost:4002
+      - .:/app
+      - ./node_modules:/app/node_modules
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - grafana-storage:/var/lib/grafana # <--- This persists your dashboards
+      PORT: 3000
+      AUTH0_CALLBACK_URL: http://localhost:3002/auth/callback
+    restart: unless-stopped
+    command: pnpm start:dev auth-service
     networks:
       - dms_default
-
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "4003:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - ./loki-data:/loki
-    networks:
-      - dms_default
-
-  promtail:
-    image: grafana/promtail:latest
-    user: root
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - ./promtail-config.yml:/etc/promtail/config.yml
-    command: -config.file=/etc/promtail/config.yml
-    networks:
-      - dms_default
+    depends_on:
+      - postgres
+      - redis
 
 volumes:
   dms_data:
   dms_redis_data:
-  grafana-storage:
-  prometheus-data:
 
 networks:
   dms_default:

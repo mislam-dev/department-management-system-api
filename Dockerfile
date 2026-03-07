@@ -10,8 +10,5 @@ RUN corepack enable pnpm
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-COPY . .
 
-EXPOSE 3000
-
-CMD [ "pnpm", "start:dev", "dms" ]
+EXPOSE 3000-3020

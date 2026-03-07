@@ -12,7 +12,38 @@ export class AuthService {
     const roles = await this.auth0.getAllRoles();
     return roles.data;
   }
-  profile(auth0_sub: string) {
-    return { auth0_sub };
+  async profile(auth0_sub: string) {
+    const user = await this.auth0.getUser(auth0_sub);
+    const { email, name, nickname, picture, user_id } = user;
+    return {
+      email,
+      name,
+      nickname,
+      picture,
+      user_id,
+    };
   }
 }
+
+export type Auth0User = {
+  created_at: string;
+  email: string;
+  email_verified: boolean;
+  identities: [
+    {
+      connection: string;
+      provider: 'auth0';
+      user_id: string;
+      isSocial: boolean;
+    },
+  ];
+  name: string;
+  nickname: string;
+  picture: string;
+  updated_at: string;
+  user_id: string;
+  last_password_reset: string;
+  last_ip: string;
+  last_login: string;
+  logins_count: number;
+};
