@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dms_api
+    container_name: dms-api
     ports:
       - 3001:3000
     env_file: .env
@@ -61,7 +61,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: auth-service
+    container_name: dms-auth-service
     ports:
       - 3002:3000
     env_file: ./apps/auth-service/.env

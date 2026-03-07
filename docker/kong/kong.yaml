@@ -8,7 +8,27 @@ services:
     port: 3002
 
     routes:
-      - name: auth-routes
+      # --- PUBLIC ROUTES ---
+      # Put the paths that don't need authentication here.
+      # Because these paths are longer, Kong will match them first.
+      - name: auth-public-routes
+        paths:
+          - /login
+          - /callback
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+        strip_path: false
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+      # --- PROTECTED ROUTES ---
+      # Put the base path here. Requests not matching the public routes
+      # will fall back to this route and hit the JWT plugin.
+      - name: auth-protected-routes
         paths:
           - /api/v1/auth
         methods:
@@ -20,7 +40,12 @@ services:
         protocols:
           - http
           - https
-
+        # Move the plugin here, so it only affects this route
+        plugins:
+          - name: jwt-keycloak
+            config:
+              # Auth0 Discovery endpoint
+              allowed_iss: ['https://${AUTH0_DOMAIN}/']
 plugins:
   - name: rate-limiting
     config:
