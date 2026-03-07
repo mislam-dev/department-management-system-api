@@ -75,9 +75,6 @@ services:
     command: pnpm start:dev auth-service
     networks:
       - dms_default
-    depends_on:
-      - postgres
-      - redis
 
 volumes:
   dms_data:
