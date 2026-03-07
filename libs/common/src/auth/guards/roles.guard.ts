@@ -4,9 +4,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { ROLES_KEY } from '../decorators/set-roles.decorator';
-import { allowedUrl } from './allowed.url';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -18,13 +16,6 @@ export class RolesGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    const request: Request = context.switchToHttp().getRequest();
-    const isAllowed = allowedUrl.some((url) => request.url.startsWith(url));
-    if (isPublic || isAllowed) return true;
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()],

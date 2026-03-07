@@ -46,6 +46,7 @@ services:
             config:
               # Auth0 Discovery endpoint
               allowed_iss: ['https://${AUTH0_DOMAIN}/']
+
 plugins:
   - name: rate-limiting
     config:
