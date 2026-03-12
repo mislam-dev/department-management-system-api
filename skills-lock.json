@@ -1,10 +1,70 @@
 {
   "version": 1,
   "skills": {
-    "nestjs-best-practices": {
-      "source": "kadajett/agent-nestjs-skills",
+    "generate-swagger-docs": {
+      "source": "qodex-ai/ai-agent-skills",
       "sourceType": "github",
-      "computedHash": "1b6f82e889d19d305e38e35594de08eca0242321f353cafa4cf5e61dd3aa1a73"
+      "computedHash": "7d2bc1cb4c97d4fc8bce461bf0cf93e4f69dd40fc18c845cbce3de16d1ccc0f3"
+    },
+    "microservices": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "2817792c141ea6a33838d6cbed021e65811953135b91d9f2967a1414ac68220d"
+    },
+    "microservices-architect": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "cbbf8c2dfcca7343a51dbbf32f7003ec635d29d95c30a948045693c13786beac"
+    },
+    "microservices-architecture": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "computedHash": "59dbf1a32a4cc3f1b68770caea62bbd37e1f7cb5b9d1acbb3750658c94f3d4cb"
+    },
+    "microservices-expert": {
+      "source": "personamanagmentlayer/pcl",
+      "sourceType": "github",
+      "computedHash": "774cbbf48ae1f78a7c8135a8f719dbd1a823bb4bd76c721dd2ac71a51dba7e88"
+    },
+    "microservices-patterns": {
+      "source": "manutej/luxor-claude-marketplace",
+      "sourceType": "github",
+      "computedHash": "84965ecbe30595bda2ac9d7f23c45135fb9c34775c0fa6f3c8123949c1dfd168"
+    },
+    "nestjs": {
+      "source": "teachingai/full-stack-skills",
+      "sourceType": "github",
+      "computedHash": "6126d4c17cde0e0d0c688ae25ee2c19231ff2bca28bd8d0fcb986502d487fe58"
+    },
+    "nestjs-best-practices": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "computedHash": "42d1126ba9d4fadbb74beb29d2831a5e9cd63ca2495552732a3df4dcb798b6c9"
+    },
+    "nestjs-clean-typescript": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "830a608ac0d15d5f93e2fcdc65c4c1fb3fdba3b687e837a01191b0714d9c25f2"
+    },
+    "nestjs-code-review": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "computedHash": "189ba270431b80f01d0a00cc46db98d4475db4ce30171f77765ab2d85da91194"
+    },
+    "nestjs-expert": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "46097125b4fd92bfffc3aaace17f9143440335173095a5a880c94a349ad15f7d"
+    },
+    "swagger-api-reader": {
+      "source": "shetengteng/skillix-hub",
+      "sourceType": "github",
+      "computedHash": "41392fc839c8fc25f449d0d9bf0838cadecdc902fed6ee58c261ca70d4d12796"
+    },
+    "swagger-doc-creator": {
+      "source": "jeremylongshore/claude-code-plugins-plus-skills",
+      "sourceType": "github",
+      "computedHash": "42e4afdae607b84400cd1a9b75a229c0c391e3c3bedd2305e7179946c775beff"
     }
   }
 }
