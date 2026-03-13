@@ -18,7 +18,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/dms/test/jest-e2e.json",
+    "test:e2e": "jest --config ./apps/dms/apps/service/dms/test/jest-e2e.json",
     "husky:prepare": "husky",
     "seed": "ts-node -r tsconfig-paths/register src/seeder/seed.ts"
   },
@@ -132,6 +132,7 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
+      "^@app/ai(|/.*)$": "<rootDir>/libs/ai/src/$1",
       "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^src/(.*)$": "<rootDir>/$1"
     },

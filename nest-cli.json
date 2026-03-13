@@ -16,6 +16,33 @@
   "monorepo": true,
   "root": "apps/dms",
   "projects": {
+    "academic": {
+      "type": "application",
+      "root": "apps/service/academic",
+      "entryFile": "main",
+      "sourceRoot": "apps/service/academic/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/service/academic/tsconfig.app.json"
+      }
+    },
+    "academic-service": {
+      "type": "application",
+      "root": "apps/academic-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/academic-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/academic-service/tsconfig.app.json"
+      }
+    },
+    "ai": {
+      "type": "library",
+      "root": "libs/ai",
+      "entryFile": "index",
+      "sourceRoot": "libs/ai/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/ai/tsconfig.lib.json"
+      }
+    },
     "auth-service": {
       "type": "application",
       "root": "apps/auth-service",

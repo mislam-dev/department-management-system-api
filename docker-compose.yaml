@@ -88,7 +88,7 @@ services:
     ports:
       - 3003:3000
     env_file: ./apps/user-service/.env
-     
+
     volumes:
       - .:/app
       - ./node_modules:/app/node_modules
@@ -120,15 +120,69 @@ services:
       retries: 5
     networks:
       - user_service
+  # USER SERVICE
+  academic_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dms-academic-service
+    ports:
+      - 3004:3000
+    volumes:
+      - .:/app
+      - ./node_modules:/app/node_modules
+    env_file: ./apps/academic-service/.env
+    environment:
+      PORT: 3000
+      DB_HOST: academic_service_db
+      DB_NAME: academic_service
+      BULL_REDIS_HOST: academic_redis
+      CACHE_REDIS_HOST: academic_redis
+    restart: unless-stopped
+    command: pnpm start:dev academic-service
+    networks:
+      - dms_default
+      - academic_service
+    depends_on:
+      - academic_service_db
+      - academic_redis
 
-  
+  academic_service_db:
+    image: postgres:16-alpine
+    container_name: dms-academic-service-database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: academic_service
+    volumes:
+      - academic_service_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - academic_service
+  academic_redis:
+    image: redis/redis-stack:latest
+    container_name: dms-academic-redis
+    volumes:
+      - dms_academic_redis_data:/data
+    restart: always
+    networks:
+      - academic_service
+
 volumes:
   dms_data:
   dms_redis_data:
   user_service_data:
+  academic_service_data:
+  dms_academic_redis_data:
 
 networks:
   dms_default:
     driver: bridge
   user_service:
+    driver: bridge
+  academic_service:
     driver: bridge

@@ -26,6 +26,12 @@
       "./src/types"
     ],
     "paths": {
+      "@app/ai": [
+        "libs/ai/src"
+      ],
+      "@app/ai/*": [
+        "libs/ai/src/*"
+      ],
       "@app/common": [
         "libs/common/src"
       ],
