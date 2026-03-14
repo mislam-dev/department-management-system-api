@@ -76,6 +76,21 @@
         "tsConfigPath": "apps/dms/tsconfig.app.json"
       }
     },
+    "docs-service": {
+      "type": "application",
+      "root": "apps/docs-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/docs-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/docs-service/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "swagger/**/*",
+            "watchAssets": true
+          }
+        ]
+      }
+    },
     "messenger-service": {
       "type": "application",
       "root": "apps/messenger-service",

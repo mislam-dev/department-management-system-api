@@ -2,6 +2,28 @@ _format_version: '3.0'
 _transform: true
 
 services:
+  - name: docs-service
+    protocol: http
+    host: host.docker.internal
+    port: 3007
+
+    routes:
+      # --- PUBLIC ROUTES ---
+      # Put the paths that don't need authentication here.
+      # Because these paths are longer, Kong will match them first.
+      - name: docs-routes
+        paths:
+          - /docs
+          - /docs/
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: true
+        preserve_host: true
+        protocols:
+          - http
+          - https
+
   - name: auth-service
     protocol: http
     host: host.docker.internal
@@ -154,39 +176,6 @@ services:
             config:
               # Auth0 Discovery endpoint
               allowed_iss: ['https://${AUTH0_DOMAIN}/']
-
-  - name: dms-api
-    protocol: http
-    host: host.docker.internal
-    port: 3001
-
-    routes:
-      - name: docs
-        paths:
-          - /docs
-        methods:
-          - GET
-        strip_path: false
-        preserve_host: true
-        protocols:
-          - http
-          - https
-
-      - name: dms-routes
-        paths:
-          - /api/v1
-        methods:
-          - GET
-          - POST
-          - PUT
-          - PATCH
-          - DELETE
-          - OPTIONS
-        strip_path: true
-        preserve_host: false
-        protocols:
-          - http
-          - https
 
 plugins:
   - name: rate-limiting
