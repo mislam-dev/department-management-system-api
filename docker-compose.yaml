@@ -171,6 +171,56 @@ services:
     restart: always
     networks:
       - academic_service
+  register_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dms-register-service
+    ports:
+      - 3005:3000
+    volumes:
+      - .:/app
+      - ./node_modules:/app/node_modules
+    env_file: ./apps/register-service/.env
+    environment:
+      PORT: 3000
+      DB_HOST: register_service_db
+      DB_NAME: register_service
+      BULL_REDIS_HOST: register_redis
+      CACHE_REDIS_HOST: register_redis
+    restart: unless-stopped
+    command: pnpm start:dev register-service
+    networks:
+      - dms_default
+      - register_service
+    depends_on:
+      - register_service_db
+      - register_redis
+
+  register_service_db:
+    image: postgres:16-alpine
+    container_name: dms-register-service-database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: register_service
+    volumes:
+      - register_service_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - register_service
+  register_redis:
+    image: redis/redis-stack:latest
+    container_name: dms-register-redis
+    volumes:
+      - dms_register_redis_data:/data
+    restart: always
+    networks:
+      - register_service
 
 volumes:
   dms_data:
@@ -178,6 +228,8 @@ volumes:
   user_service_data:
   academic_service_data:
   dms_academic_redis_data:
+  register_service_data:
+  dms_register_redis_data:
 
 networks:
   dms_default:
@@ -185,4 +237,6 @@ networks:
   user_service:
     driver: bridge
   academic_service:
+    driver: bridge
+  register_service:
     driver: bridge

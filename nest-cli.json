@@ -76,6 +76,15 @@
         "tsConfigPath": "apps/dms/tsconfig.app.json"
       }
     },
+    "register-service": {
+      "type": "application",
+      "root": "apps/register-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/register-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/register-service/tsconfig.app.json"
+      }
+    },
     "user-service": {
       "type": "application",
       "root": "apps/user-service",
