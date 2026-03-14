@@ -76,6 +76,15 @@
         "tsConfigPath": "apps/dms/tsconfig.app.json"
       }
     },
+    "messenger-service": {
+      "type": "application",
+      "root": "apps/messenger-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/messenger-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/messenger-service/tsconfig.app.json"
+      }
+    },
     "register-service": {
       "type": "application",
       "root": "apps/register-service",
