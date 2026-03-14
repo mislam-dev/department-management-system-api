@@ -1,56 +1,32 @@
 openapi: 3.0.3
 info:
-  title: Academic Service API
-  description: 'API for managing semesters, courses, schedules, rooms, activities, and notices. Focused on academic operations within the microservice architecture.'
+  title: Messenger Service API
+  description: 'API for managing conversations, messages, and participants.'
   version: 1.0.0
   contact:
     name: API Support
     email: support@example.com
 
 servers:
-  - url: http://localhost:3003/api/v1
+  - url: http://localhost:3006/
     description: Local Server
-  - url: https://academic.api.example.com/v1
-    description: Production server
 
 tags:
-  - name: Semesters
-    description: Semester management
-  - name: Courses
-    description: Courses and course details
-  - name: CourseSchedules
-    description: Course scheduling
-  - name: Room
-    description: Room management
-  - name: Activities
-    description: Activities and logs
-  - name: Notices
-    description: Notices and attachments
+  - name: Conversations
+    description: Chat conversations management
+  - name: Messages
+    description: Messages in conversations management
+  - name: Participants
+    description: Conversation participants management
 
 security:
   - bearerAuth: []
 
 paths:
-  /semester:
-    get:
-      tags: [Semesters]
-      summary: List all semesters
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Array of semesters
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Semester'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+  /conversation:
     post:
-      tags: [Semesters]
-      summary: Create semester
+      tags: [Conversations]
+      summary: Create a P2P conversation
       security:
         - bearerAuth: []
       requestBody:
@@ -58,45 +34,86 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SemesterCreateDTO'
+              $ref: '#/components/schemas/CreateConversationDto'
       responses:
         '201':
-          description: Created
+          description: Conversation created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Semester'
+                $ref: '#/components/schemas/Conversation'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+    get:
+      tags: [Conversations]
+      summary: List conversations for current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Conversation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
-  /semester/{id}:
+  /conversation/group:
+    post:
+      tags: [Conversations]
+      summary: Create a Group conversation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupConversationDto'
+      responses:
+        '201':
+          description: Group conversation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /conversation/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
+          format: uuid
     get:
-      tags: [Semesters]
-      summary: Get semester by ID
+      tags: [Conversations]
+      summary: Get conversation by ID
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Semester data
+          description: Conversation details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Semester'
+                $ref: '#/components/schemas/Conversation'
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     patch:
-      tags: [Semesters]
-      summary: Update semester
+      tags: [Conversations]
+      summary: Update conversation
       security:
         - bearerAuth: []
       requestBody:
@@ -104,316 +121,97 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SemesterUpdateDTO'
+              $ref: '#/components/schemas/UpdateConversationDto'
       responses:
-        '202':
-          description: Updated
+        '200':
+          description: Conversation updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Semester'
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
-      tags: [Semesters]
-      summary: Delete semester
+      tags: [Conversations]
+      summary: Delete conversation
       security:
         - bearerAuth: []
-      responses:
-        '204':
-          description: Deleted
-
-  /course:
-    get:
-      tags: [Courses]
-      summary: List courses
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/LimitParam'
-        - $ref: '#/components/parameters/OffsetParam'
       responses:
         '200':
-          description: Paged list of courses
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  total:
-                    type: integer
-                  results:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Courses'
-    post:
-      tags: [Courses]
-      summary: Create course
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CourseCreateDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Courses'
+          description: Conversation deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
-  /course/{id}:
+  /conversations/{conversationId}/messages:
     parameters:
-      - name: id
+      - name: conversationId
         in: path
         required: true
         schema:
           type: string
+          format: uuid
     get:
-      tags: [Courses]
-      summary: Get course by ID
+      tags: [Messages]
+      summary: List messages in conversation
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Course data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Courses'
-    patch:
-      tags: [Courses]
-      summary: Update course
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CourseUpdateDTO'
-      responses:
-        '202':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Courses'
-    delete:
-      tags: [Courses]
-      summary: Delete course
-      security:
-        - bearerAuth: []
-      responses:
-        '204':
-          description: Deleted
-
-  /course/{courseId}/schedule:
-    parameters:
-      - name: courseId
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      tags: [CourseSchedules]
-      summary: List schedules for a course
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/LimitParam'
-        - $ref: '#/components/parameters/OffsetParam'
-      responses:
-        '200':
-          description: List of schedules
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  total:
-                    type: integer
-                  results:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CourseSchedule'
-    post:
-      tags: [CourseSchedules]
-      summary: Create course schedule
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CourseScheduleCreateDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CourseSchedule'
-
-  /course/{courseId}/schedule/{id}:
-    parameters:
-      - name: courseId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      tags: [CourseSchedules]
-      summary: Get course schedule by ID
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Schedule data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CourseSchedule'
-    patch:
-      tags: [CourseSchedules]
-      summary: Update course schedule
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CourseScheduleUpdateDTO'
-      responses:
-        '202':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CourseSchedule'
-    delete:
-      tags: [CourseSchedules]
-      summary: Delete schedule
-      security:
-        - bearerAuth: []
-      responses:
-        '204':
-          description: Deleted
-
-  /room:
-    get:
-      tags: [Room]
-      summary: List rooms
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: List of rooms
+          description: List of messages
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Room'
-    post:
-      tags: [Room]
-      summary: Create room
+                  $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /conversations/{conversationId}/messages/{id}:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      tags: [Messages]
+      summary: Delete message
       security:
         - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoomCreateDto'
       responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Room'
+        '200':
+          description: Message deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
-  /room/{id}:
+  /conversations/{id}/members:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
-    get:
-      tags: [Room]
-      summary: Get room by ID
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Room data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Room'
-    patch:
-      tags: [Room]
-      summary: Update room
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoomUpdateDto'
-      responses:
-        '202':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Room'
-    delete:
-      tags: [Room]
-      summary: Delete room
-      security:
-        - bearerAuth: []
-      responses:
-        '204':
-          description: Deleted
-
-  /notice:
-    get:
-      tags: [Notices]
-      summary: List notices
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/LimitParam'
-        - $ref: '#/components/parameters/OffsetParam'
-      responses:
-        '200':
-          description: List of notices
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  total:
-                    type: integer
-                  results:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Notice'
+          format: uuid
+        description: Conversation ID
     post:
-      tags: [Notices]
-      summary: Create notice
+      tags: [Participants]
+      summary: Add participant
       security:
         - bearerAuth: []
       requestBody:
@@ -421,166 +219,75 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoticeCreateDTO'
+              $ref: '#/components/schemas/CreateParticipantDto'
       responses:
         '201':
-          description: Created
+          description: Participant added
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Notice'
-
-  /notice/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      tags: [Notices]
-      summary: Get notice by ID
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Notice data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Notice'
-    patch:
-      tags: [Notices]
-      summary: Update notice
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NoticeUpdateDTO'
-      responses:
-        '202':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Notice'
-    delete:
-      tags: [Notices]
-      summary: Delete notice
-      security:
-        - bearerAuth: []
-      responses:
-        '204':
-          description: Deleted
-
-  /activity:
-    get:
-      tags: [Activities]
-      summary: List activities
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/LimitParam'
-        - $ref: '#/components/parameters/OffsetParam'
-      responses:
-        '200':
-          description: List of activities
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  total:
-                    type: integer
-                  results:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Activity'
-    post:
-      tags: [Activities]
-      summary: Create activity
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ActivityCreateDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Activity'
-
-  /activity/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      tags: [Activities]
-      summary: Get activity by ID
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Activity data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Activity'
-    patch:
-      tags: [Activities]
-      summary: Update activity
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ActivityUpdateDTO'
-      responses:
-        '202':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Activity'
-    delete:
-      tags: [Activities]
-      summary: Delete activity
-      security:
-        - bearerAuth: []
-      responses:
-        '204':
-          description: Deleted
-
-  /course-generate:
-    post:
-      tags: [Courses]
-      summary: Generate courses/schedule for semesters
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CourseGenerateDTO'
-      responses:
-        '200':
-          description: Successful generation
+                $ref: '#/components/schemas/Participant'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      tags: [Participants]
+      summary: List participants
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of participants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Participant'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /conversations/{id}/members/{participantId}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Conversation ID
+      - name: participantId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Participant ID
+    patch:
+      tags: [Participants]
+      summary: Update participant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateParticipantDto'
+      responses:
+        '200':
+          description: Participant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 components:
   securitySchemes:
@@ -588,400 +295,187 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
   schemas:
-    # Semester
-    Semester:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required: [id, name]
-    SemesterCreateDTO:
-      type: object
-      required: [name]
-      properties:
-        name:
-          type: string
-    SemesterUpdateDTO:
-      type: object
-      properties:
-        name:
-          type: string
-
-    # Courses
-    Courses:
+    # Entities
+    Conversation:
       type: object
       properties:
         id:
           type: string
           format: uuid
-        semesterId:
-          type: string
-          format: uuid
-        code:
-          type: string
-          default: 2999
+        type:
+          $ref: '#/components/schemas/ConversationType'
         name:
           type: string
-          default: Introduction to Computer Science
-        description:
+          nullable: true
+        isRestricted:
+          type: boolean
+        createdAt:
           type: string
-          description: Basic concepts of computing
-        credits:
-          type: integer
-          format: int32
-          default: 3
-      required: [id, code, name]
-    CourseCreateDTO:
-      type: object
-      required: [code, name, credits, semesterId]
-      properties:
-        semesterId:
-          type: string
-          format: uuid
-        code:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        credits:
-          type: integer
-    CourseUpdateDTO:
-      type: object
-      properties:
-        semesterId:
-          type: string
-          format: uuid
-        code:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        credits:
-          type: integer
-
-    # course generate
-    CourseGenerateDTO:
-      type: object
-      required:
-        - semesterIds
-        - semesterStart
-        - semesterEnd
-      properties:
-        semesterIds:
+          format: date-time
+        participants:
           type: array
           items:
-            type: string
-            format: uuid
-          description: List of semester IDs to process
-        semesterStart:
-          type: string
-          format: date-time
-          example: '2023-01-01T00:00:00Z'
-          description: Start date in ISO 8601 format
-        semesterEnd:
-          type: string
-          format: date-time
-          example: '2023-01-31T23:59:59Z'
-          description: End date in ISO 8601 format
+            $ref: '#/components/schemas/Participant'
+      required: [id, type, createdAt]
 
-    # Course Schedule
-    CourseSchedule:
+    Message:
       type: object
       properties:
         id:
           type: string
           format: uuid
-        courseId:
+        content:
+          type: string
+        senderId:
           type: string
           format: uuid
-        dayOfWeek:
-          type: string
-          default: MONDAY
-        startTime:
-          type: string
-          description: time in HH:MM:SS
-        endTime:
-          type: string
-          description: time in HH:MM:SS
-        room:
-          type: string
-          default: COM-201
-        teacherId:
-          type: string
-          format: uuid
-      required:
-        - id
-        - courseId
-        - dayOfWeek
-        - startTime
-        - endTime
-        - room
-    CourseScheduleCreateDTO:
-      type: object
-      required:
-        - courseId
-        - dayOfWeek
-        - startTime
-        - endTime
-        - room
-      properties:
-        courseId:
-          type: string
-          format: uuid
-        dayOfWeek:
-          type: string
-          default: MONDAY
-        startTime:
-          type: string
-          description: time in HH:MM:SS
-        endTime:
-          type: string
-          description: time in HH:MM:SS
-        room:
-          type: string
-          default: COM-201
-        teacherId:
-          type: string
-          format: uuid
-    CourseScheduleUpdateDTO:
-      type: object
-      properties:
-        courseId:
-          type: string
-          format: uuid
-        dayOfWeek:
-          type: string
-          default: MONDAY
-        startTime:
-          type: string
-          description: time in HH:MM:SS
-        endTime:
-          type: string
-          description: time in HH:MM:SS
-        room:
-          type: string
-          default: COM-201
-        teacherId:
-          type: string
-          format: uuid
-
-    # room
-    RoomType:
-      type: string
-      enum: [office, classroom, lab, washroom]
-      description: The category/type of the room.
-
-    Room:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        location:
-          type: string
-        type:
-          $ref: '#/components/schemas/RoomType'
-        capacity:
-          type: integer
-          minimum: 1
-      required:
-        - id
-        - name
-        - location
-        - type
-        - capacity
-    RoomCreateDto:
-      type: object
-      required:
-        - name
-        - location
-        - type
-        - capacity
-      properties:
-        name:
-          type: string
-        location:
-          type: string
-        type:
-          $ref: '#/components/schemas/RoomType'
-        capacity:
-          type: integer
-          minimum: 1
-    RoomUpdateDto:
-      type: object
-      properties:
-        name:
-          type: string
-        location:
-          type: string
-        type:
-          $ref: '#/components/schemas/RoomType'
-        capacity:
-          type: integer
-          minimum: 1
-
-    # Activities
-    Activity:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        activityType:
-          type: string
-          default: Notice board
-        description:
-          type: string
-        relatedEntityType:
-          type: string
-        relatedEntityId:
-          type: string
-          format: uuid
-        leadId:
+        conversationId:
           type: string
           format: uuid
         createdAt:
           type: string
-          format: date
-        updatedAt:
-          type: string
-          format: date
-      required: [id, activityType]
-    ActivityCreateDTO:
-      type: object
-      required: [activityType]
-      properties:
-        activityType:
-          type: string
-        description:
-          type: string
-        relatedEntityType:
-          type: string
-        relatedEntityId:
-          type: string
-          format: uuid
-        leadId:
-          type: string
-          format: uuid
-    ActivityUpdateDTO:
-      type: object
-      properties:
-        activityType:
-          type: string
-        description:
-          type: string
-        relatedEntityType:
-          type: string
-        relatedEntityId:
-          type: string
-          format: uuid
-        leadId:
-          type: string
-          format: uuid
+          format: date-time
+      required: [id, content, senderId, conversationId, createdAt]
 
-    # Notices
-    Notice:
+    Participant:
       type: object
       properties:
         id:
           type: string
           format: uuid
-        createdById:
+        userId:
           type: string
           format: uuid
-        text:
+        conversationId:
           type: string
-        attachment:
+          format: uuid
+        role:
+          $ref: '#/components/schemas/ParticipantRole'
+        lastReadAt:
           type: string
+          format: date-time
           nullable: true
-      required: [id, createdById, text]
-    NoticeCreateDTO:
+      required: [id, userId, conversationId, role]
+
+    # Enums
+    ConversationType:
+      type: string
+      enum: [P2P, GROUP]
+
+    ParticipantRole:
+      type: string
+      enum: [ADMIN, MEMBER]
+
+    # DTOs
+    CreateConversationDto:
       type: object
-      required: [text]
+      required: [memberId]
       properties:
-        text:
+        isRestricted:
+          type: boolean
+        memberId:
           type: string
-        attachment:
+          format: uuid
+        name:
           type: string
-          nullable: true
-    NoticeUpdateDTO:
+
+    CreateGroupConversationDto:
+      type: object
+      required: [members, name]
+      properties:
+        isRestricted:
+          type: boolean
+        members:
+          type: array
+          items:
+            type: string
+            format: uuid
+        name:
+          type: string
+
+    UpdateConversationDto:
       type: object
       properties:
-        text:
+        isRestricted:
+          type: boolean
+        memberId:
           type: string
-        attachment:
+          format: uuid
+        name:
           type: string
-          nullable: true
+
+    CreateMessageDto:
+      type: object
+      required: [content, senderId, conversationId]
+      properties:
+        content:
+          type: string
+        senderId:
+          type: string
+          format: uuid
+        conversationId:
+          type: string
+          format: uuid
+
+    CreateParticipantDto:
+      type: object
+      required: [userId, conversationId]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        conversationId:
+          type: string
+          format: uuid
+        role:
+          $ref: '#/components/schemas/ParticipantRole'
+
+    UpdateParticipantDto:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        conversationId:
+          type: string
+          format: uuid
+        role:
+          $ref: '#/components/schemas/ParticipantRole'
+
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: string
+        error:
+          type: string
 
   responses:
     BadRequest:
-      description: Bad Request
+      description: Bad request
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              code:
-                type: integer
-              message:
-                type: string
+            $ref: '#/components/schemas/ErrorResponse'
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              code:
-                type: integer
-              statusCode:
-                type: string
+            $ref: '#/components/schemas/ErrorResponse'
     Forbidden:
       description: Forbidden
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              statusCode:
-                type: integer
-              message:
-                type: string
+            $ref: '#/components/schemas/ErrorResponse'
     NotFound:
-      description: Not Found
+      description: Not found
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              statusCode:
-                type: integer
-              message:
-                type: string
-
-  parameters:
-    LimitParam:
-      name: limit
-      in: query
-      description: Number of items to return
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 10
-    OffsetParam:
-      name: offset
-      in: query
-      description: Number of items to skip
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
+            $ref: '#/components/schemas/ErrorResponse'

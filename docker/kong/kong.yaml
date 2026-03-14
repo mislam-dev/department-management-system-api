@@ -130,6 +130,31 @@ services:
               # Auth0 Discovery endpoint
               allowed_iss: ['https://${AUTH0_DOMAIN}/']
 
+  - name: messenger-service
+    protocol: http
+    host: host.docker.internal
+    port: 3006
+
+    routes:
+      - name: messenger-routes
+        paths:
+          - /api/v1/messenger
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        # Move the plugin here, so it only affects this route
+        plugins:
+          - name: jwt-keycloak
+            config:
+              # Auth0 Discovery endpoint
+              allowed_iss: ['https://${AUTH0_DOMAIN}/']
+
   - name: dms-api
     protocol: http
     host: host.docker.internal

@@ -1,3 +1,4 @@
+import { User, type UserPayload } from '@app/common/auth/decorators';
 import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
@@ -8,10 +9,6 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import {
-  User,
-  type UserPayload,
-} from '../../../../core/authentication/auth/decorators/user.decorator';
 import { ConversationService } from './conversation.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { CreateGroupConversationDto } from './dto/create-group-conversation.dto';

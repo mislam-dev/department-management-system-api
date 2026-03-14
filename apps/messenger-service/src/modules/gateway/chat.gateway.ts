@@ -1,6 +1,9 @@
+import { UserPayload } from '@app/common/auth/decorators';
+import { WsGuard } from '@app/common/auth/guards';
 import {
   BadRequestException,
   UseFilters,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -14,8 +17,6 @@ import {
 } from '@nestjs/websockets';
 import { ValidationError } from 'class-validator';
 import { Server, Socket } from 'socket.io';
-import { UserPayload } from '../../../core/authentication/auth/decorators/user.decorator';
-import { UserService } from '../../identity/user/user.service';
 import { ChatService } from '../chat/chat.service';
 import { ConversationService } from '../chat/conversation/conversation.service';
 import { MessageBodyDto } from './dtos/send-messge.dto';
@@ -28,6 +29,7 @@ interface SocketAuth {
 }
 
 @UseFilters(new WebsocketExceptionsFilter())
+@UseGuards(WsGuard)
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -38,7 +40,6 @@ export class ChatGateway implements OnGatewayConnection {
   constructor(
     private readonly chatService: ChatService,
     private readonly jwtTokenService: JwtTokenService,
-    private readonly userService: UserService,
     private readonly conversationService: ConversationService,
   ) {}
 
@@ -60,12 +61,14 @@ export class ChatGateway implements OnGatewayConnection {
       token,
     )) as UserPayload;
 
-    const user = await this.userService.findOneByAuth0Id(payload.sub);
+    // todo implement grpc to retrieve user data
+    // const user = await this.userService.findOneByAuth0Id(payload.sub);
+    const user = { id: 'user.id' };
     const allConversations = await this.conversationService.findAll(user.id);
     const ids = allConversations.map((conversation) => conversation.id);
     await client.join(ids);
 
-    client.handshake.auth = { ...payload, userId: user.id };
+    client.handshake.auth = { ...payload, userId: 'user.id' };
   }
 
   @UsePipes(
