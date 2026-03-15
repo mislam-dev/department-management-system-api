@@ -1,6 +1,5 @@
-import { Module } from '@nestjs/common';
-
 import { Auth0JWTStrategy } from '@app/common/auth/strategy';
+import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from './config/config.module';
 

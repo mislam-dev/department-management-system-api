@@ -37,6 +37,12 @@
       ],
       "@app/common/*": [
         "libs/common/src/*"
+      ],
+      "@app/grpc": [
+        "libs/grpc/src"
+      ],
+      "@app/grpc/*": [
+        "libs/grpc/src/*"
       ]
     }
   }

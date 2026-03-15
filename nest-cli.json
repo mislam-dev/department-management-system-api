@@ -54,6 +54,11 @@
           {
             "include": "swagger/**/*",
             "watchAssets": true
+          },
+          {
+            "include": "../../libs/grpc/src/**/*.proto",
+            "outDir": "dist/apps/auth-service/proto",
+            "watchAssets": true
           }
         ]
       }
@@ -89,6 +94,19 @@
             "watchAssets": true
           }
         ]
+      }
+    },
+    "grpc": {
+      "type": "library",
+      "root": "libs/grpc",
+      "entryFile": "index",
+      "sourceRoot": "libs/grpc/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/grpc/tsconfig.lib.json",
+        "assets": [
+          "**/*.proto"
+        ],
+        "watchAssets": true
       }
     },
     "messenger-service": {
