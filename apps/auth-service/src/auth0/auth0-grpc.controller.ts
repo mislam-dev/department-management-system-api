@@ -1,5 +1,4 @@
 import {
-  Auth0CreateUserDto,
   Auth0CreateUserResponse,
   Auth0ServiceController,
   Auth0ServiceControllerMethods,
@@ -9,17 +8,37 @@ import {
 } from '@app/grpc/auth/auth0';
 import { ExceptionFilter } from '@app/grpc/filters/exception.filter';
 import { status } from '@grpc/grpc-js';
-import { Controller, UseFilters } from '@nestjs/common';
+import {
+  Controller,
+  UseFilters,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { Auth0Service } from './auth0.service';
+import { Auth0Interceptor } from './auth0/auth0.interceptor';
+import { CreateUserDto } from './dtos/auth0-create-user.dto';
 
+@UseInterceptors(Auth0Interceptor)
 @Controller()
 @UseFilters(ExceptionFilter)
+@UsePipes(
+  new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    exceptionFactory: (error) =>
+      new RpcException({
+        code: status.INVALID_ARGUMENT,
+        message: error.message,
+      }),
+  }),
+)
 @Auth0ServiceControllerMethods()
 export class Auth0GrpcController implements Auth0ServiceController {
   constructor(private readonly auth0Service: Auth0Service) {}
 
-  async createUser(data: Auth0CreateUserDto): Promise<Auth0CreateUserResponse> {
+  async createUser(data: CreateUserDto): Promise<Auth0CreateUserResponse> {
     const user = await this.auth0Service.createUser(data);
     if (!user.user_id) {
       throw new RpcException({

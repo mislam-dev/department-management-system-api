@@ -28,7 +28,6 @@ export class UserService implements OnModuleInit {
   }
   async create(createUserDto: CreateUserDto) {
     const { email, designation, fullName, password } = createUserDto;
-    this.logger.debug('Creating user ', createUserDto);
     const { userId: user_id } = await lastValueFrom(
       this.auth0Service.createUser({
         name: fullName,
