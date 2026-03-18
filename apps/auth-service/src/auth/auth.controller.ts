@@ -7,6 +7,7 @@ import { Auth0JWTGuard, PermissionsGuard } from '@app/common/auth/guards';
 import {
   Controller,
   Get,
+  Logger,
   Req,
   Request,
   Response,
@@ -18,6 +19,7 @@ import { AuthService } from './auth.service';
 
 @Controller()
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
   constructor(
     private readonly authService: AuthService,
     private readonly config: ConfigService,
@@ -53,20 +55,21 @@ export class AuthController {
     const clientId = this.config.get<string>('auth0.clientId');
     const callbackUrl = this.config.get<string>('auth0.callbackUrl');
     const audience = this.config.get<string>('auth0.audience');
-
-    return res.redirect(
+    const url =
       `https://${domain}/authorize?` +
-        `response_type=code&` +
-        `client_id=${clientId}&` +
-        `redirect_uri=${callbackUrl}&` +
-        `scope=openid%20profile%20email&` +
-        `audience=${audience}&` +
-        `code_challenge_method=none`,
-    );
+      `response_type=code&` +
+      `client_id=${clientId}&` +
+      `redirect_uri=${callbackUrl}&` +
+      `scope=openid%20profile%20email&` +
+      `audience=${audience}&` +
+      `code_challenge_method=none`;
+    this.logger.debug(url);
+    console.log(url);
+    return res.redirect(url);
   }
 
   // todo remove in production
-  @Get('callback')
+  @Get('auth/callback')
   async callback(@Request() req, @Response() res) {
     const code: string = req.query.code || '';
 

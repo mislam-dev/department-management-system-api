@@ -5,7 +5,7 @@ import * as yaml from 'js-yaml';
 import * as path from 'path';
 
 export function setupSwagger(app: INestApplication): void {
-  const logger = new Logger('Swagger Setup');
+  const logger = new Logger('SwaggerSetup');
   const swaggerFile = path.join(__dirname, 'swagger', 'swagger.yaml');
   if (fs.existsSync(swaggerFile)) {
     const files = fs.readFileSync(swaggerFile, 'utf8');

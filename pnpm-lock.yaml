@@ -267,6 +267,9 @@ importers:
       prettier:
         specifier: ^3.4.2
         version: 3.6.2
+      protoc:
+        specifier: ^34.0.0
+        version: 34.0.0
       secretlint:
         specifier: ^11.3.1
         version: 11.3.1
@@ -4427,6 +4430,11 @@ packages:
   protobufjs@7.5.4:
     resolution: {integrity: sha512-CvexbZtbov6jW2eXAvLukXjXUW1TzFaivC46BpWc/3BpcCysb5Vffu+B3XHMm8lVEuy2Mm4XGex8hBSg1yapPg==}
     engines: {node: '>=12.0.0'}
+
+  protoc@34.0.0:
+    resolution: {integrity: sha512-xaBPda5uAi/wu6VgVrBsLKe9MZbogilWeaxtaBTw5sMQUj5s4Hvywi5dHqbLnGbCCoOV4J9Qj74OnT8wMI6WUg==}
+    engines: {node: '>=20.0.0'}
+    hasBin: true
 
   proxy-addr@2.0.7:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
@@ -10022,6 +10030,8 @@ snapshots:
       '@protobufjs/utf8': 1.1.0
       '@types/node': 22.19.1
       long: 5.3.2
+
+  protoc@34.0.0: {}
 
   proxy-addr@2.0.7:
     dependencies:

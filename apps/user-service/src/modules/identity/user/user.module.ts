@@ -22,7 +22,7 @@ import { UniqueEmailConstraints } from './validators/is-unique-email.validator';
         options: {
           package: protobufPackage,
           protoPath: join(process.cwd(), 'libs/grpc/src/auth/auth0.proto'),
-          url: 'localhost:5002',
+          url: 'auth_service:5002',
         },
       },
     ]),

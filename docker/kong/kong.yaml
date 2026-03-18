@@ -4,7 +4,7 @@ _transform: true
 services:
   - name: docs-service
     protocol: http
-    host: host.docker.internal
+    host: docs_service
     port: 3007
 
     routes:
@@ -17,6 +17,7 @@ services:
           - /docs/
         methods:
           - GET
+          - HEAD
           - OPTIONS
         strip_path: true
         preserve_host: true
@@ -26,7 +27,7 @@ services:
 
   - name: auth-service
     protocol: http
-    host: host.docker.internal
+    host: auth_service
     port: 3002
 
     routes:
@@ -36,10 +37,11 @@ services:
       - name: auth-public-routes
         paths:
           - /login
-          - /callback
+          - /auth/callback
         methods:
           - GET
           - POST
+          - HEAD
           - OPTIONS
         strip_path: false
         preserve_host: false
@@ -71,7 +73,7 @@ services:
 
   - name: user-service
     protocol: http
-    host: host.docker.internal
+    host: user_service
     port: 3003
 
     routes:
@@ -99,7 +101,7 @@ services:
 
   - name: register-service
     protocol: http
-    host: host.docker.internal
+    host: register_service
     port: 3005
 
     routes:
@@ -129,7 +131,7 @@ services:
 
   - name: academic-service
     protocol: http
-    host: host.docker.internal
+    host: academic_service
     port: 3004
 
     routes:
@@ -154,7 +156,7 @@ services:
 
   - name: messenger-service
     protocol: http
-    host: host.docker.internal
+    host: messenger_service
     port: 3006
 
     routes:

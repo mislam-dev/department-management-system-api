@@ -5,6 +5,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -15,14 +16,16 @@ import { PaginationDto } from './dto/pagination.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
-@Controller('user')
+@Controller()
 @CacheTTL(1000 * 60 * 60)
 export class UserController {
+  private logger = new Logger(UserController.name);
   constructor(private readonly userService: UserService) {}
 
   @SetPermissions('users:create')
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
+    this.logger.debug('Creating user', createUserDto);
     return this.userService.create(createUserDto);
   }
 

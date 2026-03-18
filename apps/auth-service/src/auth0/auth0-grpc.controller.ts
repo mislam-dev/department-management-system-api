@@ -1,20 +1,24 @@
-import type {
+import {
   Auth0CreateUserDto,
   Auth0CreateUserResponse,
+  Auth0ServiceController,
+  Auth0ServiceControllerMethods,
   Auth0UpdateUserDto,
   Empty,
   UserIdRequest,
 } from '@app/grpc/auth/auth0';
+import { ExceptionFilter } from '@app/grpc/filters/exception.filter';
 import { status } from '@grpc/grpc-js';
-import { Controller } from '@nestjs/common';
-import { GrpcMethod, RpcException } from '@nestjs/microservices';
+import { Controller, UseFilters } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { Auth0Service } from './auth0.service';
 
 @Controller()
-export class Auth0GrpcController {
+@UseFilters(ExceptionFilter)
+@Auth0ServiceControllerMethods()
+export class Auth0GrpcController implements Auth0ServiceController {
   constructor(private readonly auth0Service: Auth0Service) {}
 
-  @GrpcMethod('AuthService', 'CreateUser')
   async createUser(data: Auth0CreateUserDto): Promise<Auth0CreateUserResponse> {
     const user = await this.auth0Service.createUser(data);
     if (!user.user_id) {
@@ -28,14 +32,12 @@ export class Auth0GrpcController {
     };
   }
 
-  @GrpcMethod('AuthService', 'UpdateUser')
   async updateUser(data: Auth0UpdateUserDto): Promise<Empty> {
     const { auth0UserId, ...rest } = data;
     await this.auth0Service.updateUser(auth0UserId, rest);
     return {};
   }
 
-  @GrpcMethod('AuthService', 'DeleteUser')
   async deleteUser(data: UserIdRequest): Promise<Empty> {
     const { userId } = data;
     await this.auth0Service.deleteUser(userId);

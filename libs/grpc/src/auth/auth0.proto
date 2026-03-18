@@ -3,7 +3,7 @@ syntax = "proto3";
 package auth0;
 
 service Auth0Service {
-  rpc CrateUser (Auth0CreateUserDto) returns (Auth0CreateUserResponse) {};
+  rpc CreateUser (Auth0CreateUserDto) returns (Auth0CreateUserResponse) {};
   rpc UpdateUser (Auth0UpdateUserDto) returns (Empty){};
   rpc DeleteUser (UserIdRequest) returns (Empty){};
 }
@@ -21,7 +21,7 @@ message Auth0CreateUserDto {
 message Auth0UpdateUserDto {
   string auth0_user_id =1;
   string email = 2;
-  string fullName = 3;
+  string name = 3;
 }
 
 message UserIdRequest {

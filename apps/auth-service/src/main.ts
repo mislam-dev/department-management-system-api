@@ -16,7 +16,7 @@ async function bootstrap() {
     transport: Transport.GRPC,
     options: {
       package: 'auth0',
-      url: `localhost:${grpcPort}`,
+      url: `0.0.0.0:${grpcPort}`,
       protoPath: join(process.cwd(), 'libs/grpc/src/auth/auth0.proto'),
     },
   });

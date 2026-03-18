@@ -28,7 +28,6 @@ services:
     environment:
       PORT: 3002
       GRPC_PORT: 5002
-      AUTH0_CALLBACK_URL: http://localhost:3002/auth/callback
       DB_HOST: postgres
     restart: unless-stopped
     command: pnpm start:dev auth-service
@@ -77,7 +76,7 @@ services:
     networks:
       - user_service
   # USER SERVICE
- 
+
   academic_service:
     build:
       context: .
