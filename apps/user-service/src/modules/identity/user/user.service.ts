@@ -1,40 +1,28 @@
-import { AUTH0_SERVICE_NAME, Auth0ServiceClient } from '@app/grpc/auth/auth0';
-import {
-  Inject,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
-import { type ClientGrpc } from '@nestjs/microservices';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { lastValueFrom } from 'rxjs';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { PACKAGE_NAME } from './grpc/constants';
+import { GrpcAuth0ServiceClient } from './grpc/auth0-service.client';
 @Injectable()
-export class UserService implements OnModuleInit {
+export class UserService {
   private logger = new Logger(UserService.name);
-  private auth0Service: Auth0ServiceClient;
+
   constructor(
     @InjectRepository(User) private readonly repository: Repository<User>,
-    @Inject(PACKAGE_NAME) private readonly client: ClientGrpc,
+    private readonly auth0ServiceClient: GrpcAuth0ServiceClient,
   ) {}
-  onModuleInit() {
-    this.auth0Service =
-      this.client.getService<Auth0ServiceClient>(AUTH0_SERVICE_NAME);
-  }
   async create(createUserDto: CreateUserDto) {
     const { email, designation, fullName, password } = createUserDto;
-    const { userId: user_id } = await lastValueFrom(
-      this.auth0Service.createUser({
-        name: fullName,
-        password,
-        email,
-      }),
-    );
+
+    this.logger.log('Creating user in Auth0...');
+    const { userId: user_id } = await this.auth0ServiceClient.createUser({
+      name: fullName,
+      email,
+      password,
+    });
+    this.logger.log('Creating user in Auth0... Done');
 
     const user = this.repository.create({
       fullName,
@@ -42,6 +30,8 @@ export class UserService implements OnModuleInit {
       email,
       auth0_user_id: user_id,
     });
+
+    this.logger.log('Creating user in database...');
     return await this.repository.save(user);
   }
 
@@ -85,21 +75,24 @@ export class UserService implements OnModuleInit {
     const user = await this.findOne(id);
     Object.assign(user, updateUserDto);
 
-    await lastValueFrom(
-      this.auth0Service.updateUser({
-        auth0UserId: user.auth0_user_id,
-        name: user.fullName,
-        email: user.email,
-      }),
-    );
+    this.logger.log('Updating user in Auth0...');
+    await this.auth0ServiceClient.update({
+      auth0UserId: user.auth0_user_id,
+      name: user.fullName,
+      email: user.email,
+    });
+    this.logger.log('Updating user in Auth0... Done');
+
     return this.repository.save(user);
   }
 
   async remove(id: string) {
     const user = await this.findOne(id);
-    await lastValueFrom(
-      this.auth0Service.deleteUser({ userId: user.auth0_user_id }),
-    );
+
+    this.logger.log('Deleting user in Auth0...');
+    await this.auth0ServiceClient.remove(user.auth0_user_id);
+    this.logger.log('Deleting user in Auth0... Done');
+
     const result = await this.repository.delete(id);
     if (!result.affected) throw new NotFoundException('User not found!');
   }

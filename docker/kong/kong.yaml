@@ -86,6 +86,8 @@ services:
         methods:
           - GET
           - POST
+          - PATCH
+          - DELETE
           - OPTIONS
         strip_path: true
         preserve_host: false
