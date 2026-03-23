@@ -27,11 +27,19 @@ import { CreateUserDto } from './dtos/auth0-create-user.dto';
   new ValidationPipe({
     transform: true,
     whitelist: true,
-    exceptionFactory: (error) =>
-      new RpcException({
+    exceptionFactory: (errors) => {
+      console.log('test');
+      const formattedError = errors.map((err) => {
+        return {
+          field: err.property,
+          values: Object.values(err.constraints || {}),
+        };
+      });
+      return new RpcException({
         code: status.INVALID_ARGUMENT,
-        message: error.message,
-      }),
+        message: formattedError,
+      });
+    },
   }),
 )
 @Auth0ServiceControllerMethods()

@@ -1,6 +1,8 @@
 import { logger, LoggingInterceptor } from '@app/common/logger';
+import { validationPipe } from '@app/common/pipes/validation.pipe';
 import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
+import { useContainer } from 'class-validator';
 import { join } from 'path';
 import { AuthServiceModule } from './auth-service.module';
 import { setupSwagger } from './swagger/swagger.config';
@@ -22,6 +24,9 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
+
+  app.useGlobalPipes(validationPipe);
+  useContainer(app.select(AuthServiceModule), { fallbackOnErrors: true });
 
   app.useGlobalInterceptors(new LoggingInterceptor());
   setupSwagger(app);
