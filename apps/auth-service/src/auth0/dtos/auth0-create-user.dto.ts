@@ -1,4 +1,4 @@
-import { Auth0CreateUserDto } from '@app/grpc/auth/auth0';
+import { Auth0CreateUserDto } from '@app/grpc/protos/auth0';
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { IsEmailUnique } from '../decorators/is-unique-email.validator';
 

@@ -1,3 +1,4 @@
+import { ExceptionFilter } from '@app/grpc/filters/exception.filter';
 import {
   Auth0CreateUserResponse,
   Auth0ServiceController,
@@ -5,8 +6,7 @@ import {
   Auth0UpdateUserDto,
   Empty,
   UserIdRequest,
-} from '@app/grpc/auth/auth0';
-import { ExceptionFilter } from '@app/grpc/filters/exception.filter';
+} from '@app/grpc/protos/auth0';
 import { status } from '@grpc/grpc-js';
 import {
   Controller,

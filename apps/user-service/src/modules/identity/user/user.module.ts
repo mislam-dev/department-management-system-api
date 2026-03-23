@@ -1,4 +1,4 @@
-import { protobufPackage } from '@app/grpc/auth/auth0';
+import { protobufPackage } from '@app/grpc/protos/auth0';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -27,7 +27,7 @@ import { UniqueEmailConstraints } from './validators/is-unique-email.validator';
         transport: Transport.GRPC,
         options: {
           package: protobufPackage,
-          protoPath: join(process.cwd(), 'libs/grpc/src/auth/auth0.proto'),
+          protoPath: join(process.cwd(), 'libs/grpc/src/protos/auth0.proto'),
           url: 'auth_service:5002',
         },
       },

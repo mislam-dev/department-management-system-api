@@ -1,4 +1,4 @@
-import { AUTH0_SERVICE_NAME, Auth0ServiceClient } from '@app/grpc/auth/auth0';
+import { AUTH0_SERVICE_NAME, Auth0ServiceClient } from '@app/grpc/protos/auth0';
 import { Inject, Logger } from '@nestjs/common';
 import type { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
