@@ -2,6 +2,6 @@
   "*": "secretlint",
   "*.ts": [
     "eslint --fix --no-warn-ignored --max-warnings 0",
-    "pnpm run test --findRelatedTests --passWithNoTests"
+    "pnpm run test --findRelatedTests --passWithNoTests --bail"
   ]
 }

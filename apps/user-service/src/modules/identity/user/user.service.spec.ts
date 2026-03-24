@@ -5,6 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import { GrpcAuth0ServiceClient } from './grpc/auth0-service.client';
 
 describe('UserService', () => {
   let service: UserService;
@@ -30,8 +31,8 @@ describe('UserService', () => {
 
   const mockAuth0Service = {
     createUser: jest.fn(),
-    updateUser: jest.fn(),
-    deleteUser: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -41,6 +42,10 @@ describe('UserService', () => {
         {
           provide: getRepositoryToken(User),
           useValue: mockRepository,
+        },
+        {
+          provide: GrpcAuth0ServiceClient,
+          useValue: mockAuth0Service,
         },
       ],
     }).compile();
@@ -66,7 +71,7 @@ describe('UserService', () => {
     };
 
     it('should create a new user', async () => {
-      mockAuth0Service.createUser.mockResolvedValue({ user_id: 'auth0-id' });
+      mockAuth0Service.createUser.mockResolvedValue({ userId: 'auth0-id' });
       mockRepository.create.mockReturnValue(mockUser);
       mockRepository.save.mockResolvedValue(mockUser);
 
@@ -177,7 +182,7 @@ describe('UserService', () => {
 
     it('should update a user', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
-      mockAuth0Service.updateUser.mockResolvedValue(undefined);
+      mockAuth0Service.update.mockResolvedValue(undefined);
       const updatedUser = { ...mockUser, ...updateUserDto };
       mockRepository.save.mockResolvedValue(updatedUser);
 
@@ -209,7 +214,7 @@ describe('UserService', () => {
   describe('remove', () => {
     it('should remove a user', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
-      mockAuth0Service.deleteUser.mockResolvedValue(undefined);
+      mockAuth0Service.remove.mockResolvedValue(undefined);
       mockRepository.delete.mockResolvedValue({ affected: 1 });
 
       await service.remove('user-id');
@@ -230,7 +235,7 @@ describe('UserService', () => {
 
     it('should throw NotFoundException if delete result not affected', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
-      mockAuth0Service.deleteUser.mockResolvedValue(undefined);
+      mockAuth0Service.remove.mockResolvedValue(undefined);
       mockRepository.delete.mockResolvedValue({ affected: 0 });
 
       await expect(service.remove('user-id')).rejects.toThrow(
