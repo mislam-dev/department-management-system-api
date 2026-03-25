@@ -30,12 +30,6 @@ export class CourseGenerateConsumer extends WorkerHost {
       rooms: [],
       teachersUnavailability: [],
     });
-    // todo remove on productions
-    // const data: string = await new Promise((resolve) => {
-    //   setTimeout(() => {
-    //     resolve('data');
-    //   }, 4000);
-    // });
     await this.courseGenerateService.saveData(data, dto.id);
     await job.updateProgress(100);
 

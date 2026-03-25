@@ -18,7 +18,7 @@ import { SemesterService } from './semester.service';
 export class SemesterController {
   constructor(private readonly semesterService: SemesterService) {}
 
-  @SetPermissions('semester:create') // todo use only permissions
+  @SetPermissions('semester:create')
   @Post()
   create(@Body() createSemesterDto: CreateSemesterDto) {
     return this.semesterService.create(createSemesterDto);
