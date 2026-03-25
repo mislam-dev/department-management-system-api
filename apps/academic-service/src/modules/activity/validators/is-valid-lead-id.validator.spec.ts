@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { UserServiceClient } from '../grpc/user-service.client';
 import { IsValidLeadIDConstraint } from './is-valid-lead-id.validator';
 
 // const mockStudentId = 'uuid-id';
@@ -11,7 +12,15 @@ describe('IsValidLeadIDConstraint', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [IsValidLeadIDConstraint],
+      providers: [
+        IsValidLeadIDConstraint,
+        {
+          provide: UserServiceClient,
+          useValue: {
+            getUserById: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     constraints = module.get(IsValidLeadIDConstraint);

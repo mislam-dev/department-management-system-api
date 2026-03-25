@@ -4,6 +4,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { User } from './entities/user.entity';
+import { GrpcUserController } from './grpc-user.controller';
 import { GrpcAuth0ServiceClient } from './grpc/auth0-service.client';
 import { PACKAGE_NAME } from './grpc/constants';
 import { UserController } from './user.controller';
@@ -12,7 +13,7 @@ import { NotDummyEmailConstraints } from './validators/is-email-not-dummy.valida
 import { UniqueEmailConstraints } from './validators/is-unique-email.validator';
 
 @Module({
-  controllers: [UserController],
+  controllers: [UserController, GrpcUserController],
   providers: [
     UserService,
     UniqueEmailConstraints,
