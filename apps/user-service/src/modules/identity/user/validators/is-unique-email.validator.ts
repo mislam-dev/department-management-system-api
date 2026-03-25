@@ -17,14 +17,7 @@ export class UniqueEmailConstraints implements ValidatorConstraintInterface {
     try {
       // check if db has the user
       const user = await this.userService.findByEmail(email);
-      if (user) return false;
-
-      // check if user is exist on auth0
-      // const auth0User = await this.auth0Service.getUserByEmail(email);
-      // if (auth0User) return false;
-      // todo check user exist on auth0
-
-      return true;
+      return !user;
     } catch {
       return true;
     }
