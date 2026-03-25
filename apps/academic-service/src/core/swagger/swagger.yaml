@@ -1,0 +1,987 @@
+openapi: 3.0.3
+info:
+  title: Academic Service API
+  description: 'API for managing semesters, courses, schedules, rooms, activities, and notices. Focused on academic operations within the microservice architecture.'
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:3003/api/v1
+    description: Local Server
+  - url: https://academic.api.example.com/v1
+    description: Production server
+
+tags:
+  - name: Semesters
+    description: Semester management
+  - name: Courses
+    description: Courses and course details
+  - name: CourseSchedules
+    description: Course scheduling
+  - name: Room
+    description: Room management
+  - name: Activities
+    description: Activities and logs
+  - name: Notices
+    description: Notices and attachments
+
+security:
+  - bearerAuth: []
+
+paths:
+  /semester:
+    get:
+      tags: [Semesters]
+      summary: List all semesters
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Array of semesters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Semester'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Semesters]
+      summary: Create semester
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemesterCreateDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Semester'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /semester/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Semesters]
+      summary: Get semester by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Semester data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Semester'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Semesters]
+      summary: Update semester
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemesterUpdateDTO'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Semester'
+    delete:
+      tags: [Semesters]
+      summary: Delete semester
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+
+  /course:
+    get:
+      tags: [Courses]
+      summary: List courses
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        '200':
+          description: Paged list of courses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Courses'
+    post:
+      tags: [Courses]
+      summary: Create course
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreateDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courses'
+
+  /course/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Courses]
+      summary: Get course by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Course data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courses'
+    patch:
+      tags: [Courses]
+      summary: Update course
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseUpdateDTO'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courses'
+    delete:
+      tags: [Courses]
+      summary: Delete course
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+
+  /course/{courseId}/schedule:
+    parameters:
+      - name: courseId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [CourseSchedules]
+      summary: List schedules for a course
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        '200':
+          description: List of schedules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CourseSchedule'
+    post:
+      tags: [CourseSchedules]
+      summary: Create course schedule
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseScheduleCreateDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSchedule'
+
+  /course/{courseId}/schedule/{id}:
+    parameters:
+      - name: courseId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [CourseSchedules]
+      summary: Get course schedule by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Schedule data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSchedule'
+    patch:
+      tags: [CourseSchedules]
+      summary: Update course schedule
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseScheduleUpdateDTO'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSchedule'
+    delete:
+      tags: [CourseSchedules]
+      summary: Delete schedule
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+
+  /room:
+    get:
+      tags: [Room]
+      summary: List rooms
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+    post:
+      tags: [Room]
+      summary: Create room
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreateDto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+
+  /room/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Room]
+      summary: Get room by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Room data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+    patch:
+      tags: [Room]
+      summary: Update room
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomUpdateDto'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+    delete:
+      tags: [Room]
+      summary: Delete room
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+
+  /notice:
+    get:
+      tags: [Notices]
+      summary: List notices
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        '200':
+          description: List of notices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notice'
+    post:
+      tags: [Notices]
+      summary: Create notice
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoticeCreateDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+
+  /notice/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Notices]
+      summary: Get notice by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notice data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+    patch:
+      tags: [Notices]
+      summary: Update notice
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoticeUpdateDTO'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+    delete:
+      tags: [Notices]
+      summary: Delete notice
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+
+  /activity:
+    get:
+      tags: [Activities]
+      summary: List activities
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        '200':
+          description: List of activities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Activity'
+    post:
+      tags: [Activities]
+      summary: Create activity
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityCreateDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+
+  /activity/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Activities]
+      summary: Get activity by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Activity data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+    patch:
+      tags: [Activities]
+      summary: Update activity
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityUpdateDTO'
+      responses:
+        '202':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+    delete:
+      tags: [Activities]
+      summary: Delete activity
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+
+  /course-generate:
+    post:
+      tags: [Courses]
+      summary: Generate courses/schedule for semesters
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseGenerateDTO'
+      responses:
+        '200':
+          description: Successful generation
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    # Semester
+    Semester:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required: [id, name]
+    SemesterCreateDTO:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+    SemesterUpdateDTO:
+      type: object
+      properties:
+        name:
+          type: string
+
+    # Courses
+    Courses:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        semesterId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          default: 2999
+        name:
+          type: string
+          default: Introduction to Computer Science
+        description:
+          type: string
+          description: Basic concepts of computing
+        credits:
+          type: integer
+          format: int32
+          default: 3
+      required: [id, code, name]
+    CourseCreateDTO:
+      type: object
+      required: [code, name, credits, semesterId]
+      properties:
+        semesterId:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        credits:
+          type: integer
+    CourseUpdateDTO:
+      type: object
+      properties:
+        semesterId:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        credits:
+          type: integer
+
+    # course generate
+    CourseGenerateDTO:
+      type: object
+      required:
+        - semesterIds
+        - semesterStart
+        - semesterEnd
+      properties:
+        semesterIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: List of semester IDs to process
+        semesterStart:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00Z'
+          description: Start date in ISO 8601 format
+        semesterEnd:
+          type: string
+          format: date-time
+          example: '2023-01-31T23:59:59Z'
+          description: End date in ISO 8601 format
+
+    # Course Schedule
+    CourseSchedule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        courseId:
+          type: string
+          format: uuid
+        dayOfWeek:
+          type: string
+          default: MONDAY
+        startTime:
+          type: string
+          description: time in HH:MM:SS
+        endTime:
+          type: string
+          description: time in HH:MM:SS
+        room:
+          type: string
+          default: COM-201
+        teacherId:
+          type: string
+          format: uuid
+      required:
+        - id
+        - courseId
+        - dayOfWeek
+        - startTime
+        - endTime
+        - room
+    CourseScheduleCreateDTO:
+      type: object
+      required:
+        - courseId
+        - dayOfWeek
+        - startTime
+        - endTime
+        - room
+      properties:
+        courseId:
+          type: string
+          format: uuid
+        dayOfWeek:
+          type: string
+          default: MONDAY
+        startTime:
+          type: string
+          description: time in HH:MM:SS
+        endTime:
+          type: string
+          description: time in HH:MM:SS
+        room:
+          type: string
+          default: COM-201
+        teacherId:
+          type: string
+          format: uuid
+    CourseScheduleUpdateDTO:
+      type: object
+      properties:
+        courseId:
+          type: string
+          format: uuid
+        dayOfWeek:
+          type: string
+          default: MONDAY
+        startTime:
+          type: string
+          description: time in HH:MM:SS
+        endTime:
+          type: string
+          description: time in HH:MM:SS
+        room:
+          type: string
+          default: COM-201
+        teacherId:
+          type: string
+          format: uuid
+
+    # room
+    RoomType:
+      type: string
+      enum: [office, classroom, lab, washroom]
+      description: The category/type of the room.
+
+    Room:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        location:
+          type: string
+        type:
+          $ref: '#/components/schemas/RoomType'
+        capacity:
+          type: integer
+          minimum: 1
+      required:
+        - id
+        - name
+        - location
+        - type
+        - capacity
+    RoomCreateDto:
+      type: object
+      required:
+        - name
+        - location
+        - type
+        - capacity
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        type:
+          $ref: '#/components/schemas/RoomType'
+        capacity:
+          type: integer
+          minimum: 1
+    RoomUpdateDto:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        type:
+          $ref: '#/components/schemas/RoomType'
+        capacity:
+          type: integer
+          minimum: 1
+
+    # Activities
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        activityType:
+          type: string
+          default: Notice board
+        description:
+          type: string
+        relatedEntityType:
+          type: string
+        relatedEntityId:
+          type: string
+          format: uuid
+        leadId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
+      required: [id, activityType]
+    ActivityCreateDTO:
+      type: object
+      required: [activityType]
+      properties:
+        activityType:
+          type: string
+        description:
+          type: string
+        relatedEntityType:
+          type: string
+        relatedEntityId:
+          type: string
+          format: uuid
+        leadId:
+          type: string
+          format: uuid
+    ActivityUpdateDTO:
+      type: object
+      properties:
+        activityType:
+          type: string
+        description:
+          type: string
+        relatedEntityType:
+          type: string
+        relatedEntityId:
+          type: string
+          format: uuid
+        leadId:
+          type: string
+          format: uuid
+
+    # Notices
+    Notice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdById:
+          type: string
+          format: uuid
+        text:
+          type: string
+        attachment:
+          type: string
+          nullable: true
+      required: [id, createdById, text]
+    NoticeCreateDTO:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+        attachment:
+          type: string
+          nullable: true
+    NoticeUpdateDTO:
+      type: object
+      properties:
+        text:
+          type: string
+        attachment:
+          type: string
+          nullable: true
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              message:
+                type: string
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              statusCode:
+                type: string
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+              message:
+                type: string
+
+  parameters:
+    LimitParam:
+      name: limit
+      in: query
+      description: Number of items to return
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 10
+    OffsetParam:
+      name: offset
+      in: query
+      description: Number of items to skip
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0

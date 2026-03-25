@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package course_schedule;
+
+service CourseScheduleService {
+  rpc getCourseScheduleById(CourseScheduleIdRequest) returns (CourseScheduleResponse) {};
+}
+
+message CourseScheduleResponse {
+  string id = 1;
+  string courseId = 2;
+  string dayOfWeek = 3;
+  string startTime = 4;
+  string endTime = 5;
+  optional string room = 6;
+  optional string teacherId = 7;
+}
+
+message CourseScheduleIdRequest {
+  string id = 1;
+}
+

@@ -1,0 +1,56 @@
+services:
+  # Prometheus: The Data Collector
+  prometheus:
+    image: prom/prometheus
+    container_name: dms-prometheus
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus # <--- Persists your metrics history
+    ports:
+      - '4001:9090'
+    networks:
+      - dms_default
+
+  # Grafana: The Visualizer
+  grafana:
+    image: grafana/grafana
+    container_name: dms-grafana
+    ports:
+      - '4002:3000' # Access at localhost:4002
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana # <--- This persists your dashboards
+    networks:
+      - dms_default
+
+  loki:
+    image: grafana/loki:latest
+    container_name: dms-loki
+    ports:
+      - '4003:3100'
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ../loki-data:/loki
+    networks:
+      - dms_default
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: dms-promtail
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./configs/promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - dms_default
+
+volumes:
+  grafana-storage:
+  prometheus-data:
+
+networks:
+  dms_default:
+    driver: bridge

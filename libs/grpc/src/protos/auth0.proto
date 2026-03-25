@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package auth0;
+
+service Auth0Service {
+  rpc CreateUser (Auth0CreateUserDto) returns (Auth0CreateUserResponse) {};
+  rpc UpdateUser (Auth0UpdateUserDto) returns (Empty){};
+  rpc DeleteUser (UserIdRequest) returns (Empty){};
+  rpc GetUserById (UserIdRequest) returns (Auth0GetUserByIdResponse){};
+}
+
+message Auth0CreateUserResponse {
+  string user_id= 1;
+}
+message Auth0GetUserByIdResponse {
+  string user_id= 1;
+  optional string email= 2;
+  optional string username= 3;
+}
+
+message Auth0CreateUserDto {
+  string name= 1;
+  string password= 2;
+  string email= 3;
+}
+
+message Auth0UpdateUserDto {
+  string auth0_user_id =1;
+  string email = 2;
+  string name = 3;
+}
+
+message UserIdRequest {
+  string user_id = 1;
+}
+
+message Empty {
+}

@@ -1,0 +1,32 @@
+server:
+  http_listen_port: 4004
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:4003/loki/api/v1/push
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+
+    # --- THIS PART IS NEW ---
+    pipeline_stages:
+      - docker: {} # Parses the Docker log format (JSON) to get the timestamp
+      - drop:
+          older_than: 1h
+          drop_counter_reason: 'too_old_from_2025'
+    # ------------------------
+
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/dms.*'
+        action: keep
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'stream'

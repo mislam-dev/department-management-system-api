@@ -1,0 +1,9 @@
+✔ implement grpc on student module on user service @started(26-03-25 17:51) @done(26-03-25 18:05) @lasted(14m40s)
+  ✔ create proto file and generate ts code @done(26-03-25 18:02)
+  ✔ add proto file to user service @done(26-03-25 18:02)
+  ✔ add grpc controller on student module @done(26-03-25 18:02)
+- validate on payment api service 
+  ✔ create grpc student client @done(26-03-25 18:02)
+  ✔ add DI on module @started(26-03-25 18:02) @done(26-03-25 18:05) @lasted(3m20s)
+  ✔ validate on create payment api @started(26-03-25 18:05) @done(26-03-25 18:14) @lasted(9m13s)
+  ✔ debugging @started(26-03-25 18:14) @done(26-03-25 18:14) @lasted(20s)
