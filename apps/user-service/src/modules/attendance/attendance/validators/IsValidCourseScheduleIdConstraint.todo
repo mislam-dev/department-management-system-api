@@ -1,4 +1,4 @@
-☐ IsValidCourseScheduleIdConstraint @started(26-03-25 15:17)
+✔ IsValidCourseScheduleIdConstraint @started(26-03-25 15:17) @done(26-03-25 16:18) @lasted(1h1m6s)
   ✔ implement grpc logic on academic service for course schedule @started(26-03-25 15:17) @done(26-03-25 15:46) @lasted(29m24s)
    ✔ add proto file generate ts file @started(26-03-25 15:18) @done(26-03-25 15:29) @lasted(11m49s)
    ✔ create and start microservice on academic service for course schedule @started(26-03-25 15:29) @done(26-03-25 15:29) @lasted(56s)
@@ -9,4 +9,4 @@
     ✔ do DI for client module on the attendance module file @started(26-03-25 15:46) @done(26-03-25 15:50) @lasted(4m23s)
   ✔ implement validation and remove unused comments an code. @started(26-03-25 15:46) @done(26-03-25 15:50) @lasted(4m27s)
   ✔ debugging @started(26-03-25 15:52) @done(26-03-25 16:00) @lasted(8m57s)
-  - update module test cases @started(26-03-25 16:01)
+  ✔ update module test cases @started(26-03-25 16:01) @done(26-03-25 16:18) @lasted(17m4s)
