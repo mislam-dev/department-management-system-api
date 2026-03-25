@@ -1,4 +1,5 @@
 import { SetPermissions } from '@app/common/auth/decorators';
+import { GrpcToHttpInterceptor } from '@app/grpc/interceptor/grpc-to-http.interceptor';
 import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
@@ -9,12 +10,13 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentService } from './student.service';
-
+@UseInterceptors(GrpcToHttpInterceptor)
 @Controller('student')
 @CacheTTL(1000 * 60 * 60 * 24 * 14) // 14 days
 export class StudentController {

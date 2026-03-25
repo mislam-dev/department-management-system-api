@@ -4,13 +4,13 @@ info:
   description: >-
     This is the unified API documentation for the Academic Management System, built using a production-grade microservices architecture. 
     All services are orchestrated via the Kong API Gateway, providing a single entry point for all client requests.
-    
+
     The system is composed of several specialized services:
     - **User Service**: Handles identity management for students, teachers, and staff.
     - **Academic Service**: Manages course catalogs, semesters, scheduling, and notifications.
     - **Registry Service**: Governs financial transactions, fee management, and academic reporting.
     - **Messenger Service**: Facilitates real-time communication between system participants.
-    
+
     Auth0 is utilized for secure, centralized authentication and authorization across the entire ecosystem.
   version: 1.0.0
   contact:
@@ -124,7 +124,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /user:
+  /user/user:
     get:
       tags: [Users]
       summary: List users
@@ -193,7 +193,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-  /user/{id}:
+  /user/user/{id}:
     parameters:
       - name: id
         in: path

@@ -3,20 +3,18 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { setTimeout } from 'timers/promises';
+import { UserServiceClient } from '../grpc/user-service.client';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class IsValidLeadIDConstraint implements ValidatorConstraintInterface {
+  constructor(private readonly userService: UserServiceClient) {}
   async validate(leadId: string) {
     if (!leadId) return false;
 
     try {
-      // todo user service with grpc to validate this user
-      // const exists = await this.userService.findOne(leadId);
-      // return !!exists;
-      await setTimeout(0);
-      return true;
+      const exists = await this.userService.getUserById(leadId);
+      return !!exists;
     } catch {
       return false;
     }

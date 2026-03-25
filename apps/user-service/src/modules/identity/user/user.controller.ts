@@ -1,23 +1,28 @@
 import { SetPermissions } from '@app/common/auth/decorators';
+import { GrpcToHttpInterceptor } from '@app/grpc/interceptor/grpc-to-http.interceptor';
 import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
+@UseInterceptors(GrpcToHttpInterceptor)
 @Controller('user')
 @CacheTTL(1000 * 60 * 60)
 export class UserController {
+  private logger = new Logger(UserController.name);
   constructor(private readonly userService: UserService) {}
 
   @SetPermissions('users:create')

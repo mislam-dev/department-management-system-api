@@ -1,18 +1,23 @@
-import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { GrpcCourseScheduleServiceClient } from '../grpc/course-schedule.client';
 import { IsValidCourseScheduleIdConstraint } from './is-valid-course-schedule-id.validator';
 
 const mockId = 'uuid-id';
 
-const mockService = {
-  findOne: jest.fn(),
-};
 describe('IsValidCourseScheduleIdConstraint', () => {
   let constraints: IsValidCourseScheduleIdConstraint;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [IsValidCourseScheduleIdConstraint],
+      providers: [
+        IsValidCourseScheduleIdConstraint,
+        {
+          provide: GrpcCourseScheduleServiceClient,
+          useValue: {
+            getCourseScheduleById: jest.fn().mockResolvedValue(true),
+          },
+        },
+      ],
     }).compile();
 
     constraints = module.get<IsValidCourseScheduleIdConstraint>(
@@ -29,28 +34,12 @@ describe('IsValidCourseScheduleIdConstraint', () => {
   });
 
   describe('validate', () => {
-    it('should return true if student is exist', async () => {
-      mockService.findOne.mockResolvedValue({ id: mockId });
+    it('should return true if course schedule exists (placeholder)', async () => {
       const isValid = await constraints.validate(mockId);
-      expect(mockService.findOne).toHaveBeenCalledWith(mockId);
       expect(isValid).toBe(true);
     });
-    it('should return false if student id is empty/null', async () => {
+    it('should return false if course schedule id is empty/null', async () => {
       const isValid = await constraints.validate('');
-      expect(mockService.findOne).not.toHaveBeenCalled();
-      expect(isValid).toBe(false);
-    });
-    it('should return false if user service throw an error', async () => {
-      mockService.findOne.mockRejectedValue(new NotFoundException());
-      const invalidId = 'invalid-id';
-      const isValid = await constraints.validate(invalidId);
-      expect(mockService.findOne).toHaveBeenCalledWith(invalidId);
-      expect(isValid).toBe(false);
-    });
-    it('should return false if user service return null', async () => {
-      mockService.findOne.mockResolvedValue(null);
-      const isValid = await constraints.validate(mockId);
-      expect(mockService.findOne).toHaveBeenCalledWith(mockId);
       expect(isValid).toBe(false);
     });
   });

@@ -4,22 +4,20 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { setTimeout } from 'timers/promises';
+import { GrpcSemesterServiceClient } from '../grpc/semester-service.client';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class IsValidSemesterIdConstraints
   implements ValidatorConstraintInterface
 {
+  constructor(private readonly semesterService: GrpcSemesterServiceClient) {}
   async validate(semesterId: string): Promise<boolean> {
     if (!semesterId) return false;
     try {
-      // todo: check semester exist on semester service
-      // const findSemester = await this.semesterService.findOne(semesterId);
-      // if (findSemester) return true;
-      // return false;
-      await setTimeout(0); // todo remove on production
-      return true;
+      const findSemester =
+        await this.semesterService.getSemesterById(semesterId);
+      return !!findSemester;
     } catch {
       return false;
     }
