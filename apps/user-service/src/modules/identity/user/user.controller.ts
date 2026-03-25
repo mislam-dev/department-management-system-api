@@ -19,7 +19,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @UseInterceptors(GrpcToHttpInterceptor)
-@Controller()
+@Controller('user')
 @CacheTTL(1000 * 60 * 60)
 export class UserController {
   private logger = new Logger(UserController.name);
