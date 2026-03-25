@@ -9,6 +9,8 @@ import { CreatePaymentApiDto } from './dto/create-payment-api.dto';
 import { SslcommerzCallbackDto } from './dto/sslcommerz-callback.dto';
 import { UpdatePaymentApiDto } from './dto/update-payment-api.dto';
 import { Payment, PaymentStatus } from './entities/payment-api.entity';
+import { GrpcStudentServiceClient } from './grpc/student-service.client';
+import { GrpcUserServiceClient } from './grpc/user-service.client';
 
 @Injectable()
 export class PaymentApiService {
@@ -17,6 +19,8 @@ export class PaymentApiService {
     private readonly paymentRepository: Repository<Payment>,
     private readonly paymentFactory: PaymentFactory,
     private readonly feeService: FeeService,
+    private readonly grpcStudentServiceClient: GrpcStudentServiceClient,
+    private readonly grpcUserServiceClient: GrpcUserServiceClient,
   ) {}
 
   async create(createPaymentApiDto: CreatePaymentApiDto) {
@@ -26,24 +30,19 @@ export class PaymentApiService {
       throw new NotFoundException(`Fee with ID "${feesId}" not found`);
     }
 
-    // todo use use service to fetch via grpc
-    // const student = await this.studentService.findOne(fee.studentId);
-    // if (!student) {
-    // if (!student) {
-    //   throw new NotFoundException(
-    //     `Student with ID "${fee.studentId}" not found`,
-    //   );
-    // }
-    // const user = await this.userService.findOne(student.userId);
-    // if (!user) {
-    //   throw new NotFoundException(`User with ID "${student.userId}" not found`);
-    // }
+    const student = await this.grpcStudentServiceClient.getStudentById(
+      fee.studentId,
+    );
+    if (!student) {
+      throw new NotFoundException(
+        `Student with ID "${fee.studentId}" not found`,
+      );
+    }
 
-    // todo remove on production
-    const user = {
-      fullName: 'test',
-      email: 'test',
-    };
+    const user = await this.grpcUserServiceClient.getUserById(student.userId);
+    if (!user) {
+      throw new NotFoundException(`User with ID "${student.userId}" not found`);
+    }
 
     const strategy = this.paymentFactory.getStrategy(provider as any);
     const p = await strategy.init({

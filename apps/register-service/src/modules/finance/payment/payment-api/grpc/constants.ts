@@ -1,0 +1,1 @@
+export const SEMESTER_PACKAGE = 'SEMESTER_PACKAGE';

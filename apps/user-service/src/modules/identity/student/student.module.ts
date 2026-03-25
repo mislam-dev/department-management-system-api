@@ -5,13 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { UserModule } from '../user/user.module';
 import { Student } from './entities/student.entity';
+import { GrpcStudentController } from './grpc-student.controller';
 import { GrpcSemesterServiceClient } from './grpc/semester-service.client';
 import { StudentController } from './student.controller';
 import { StudentService } from './student.service';
 import { IsValidSemesterIdConstraints } from './validator/is-valid-semester-id.validator';
 
 @Module({
-  controllers: [StudentController],
+  controllers: [StudentController, GrpcStudentController],
   providers: [
     StudentService,
     IsValidSemesterIdConstraints,

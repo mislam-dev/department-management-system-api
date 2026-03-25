@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package student;
+
+service StudentService {
+  rpc GetStudentById (StudentIdRequest) returns (StudentResponse) {};
+  
+}
+
+message StudentResponse {
+string id=1;
+string userId=2;
+string enrolmentDate=3;
+optional string status=4;
+string session=5;
+optional int32 graduationYear=6;
+string currentSemesterId=7;
+string currentSemester=8;
+}
+
+
+message StudentIdRequest {
+  string studentId = 1;
+}
+

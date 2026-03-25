@@ -1,5 +1,6 @@
 import { logger, LoggingInterceptor } from '@app/common/logger';
 import { validationPipe } from '@app/common/pipes/validation.pipe';
+import { STUDENT_PACKAGE_NAME } from '@app/grpc/protos/student';
 import { USER_PACKAGE_NAME } from '@app/grpc/protos/user';
 import { NestFactory } from '@nestjs/core';
 import { GrpcOptions, Transport } from '@nestjs/microservices';
@@ -18,8 +19,11 @@ async function bootstrap() {
   app.connectMicroservice<GrpcOptions>({
     transport: Transport.GRPC,
     options: {
-      package: [USER_PACKAGE_NAME],
-      protoPath: [join(process.cwd(), 'libs/grpc/src/protos/user.proto')],
+      package: [USER_PACKAGE_NAME, STUDENT_PACKAGE_NAME],
+      protoPath: [
+        join(process.cwd(), 'libs/grpc/src/protos/user.proto'),
+        join(process.cwd(), 'libs/grpc/src/protos/student.proto'),
+      ],
       url: `0.0.0.0:${grpcPort}`,
     },
   });
