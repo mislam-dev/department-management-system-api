@@ -14,6 +14,12 @@ export interface Auth0CreateUserResponse {
   userId: string;
 }
 
+export interface Auth0GetUserByIdResponse {
+  userId: string;
+  email?: string | undefined;
+  username?: string | undefined;
+}
+
 export interface Auth0CreateUserDto {
   name: string;
   password: string;
@@ -41,6 +47,8 @@ export interface Auth0ServiceClient {
   updateUser(request: Auth0UpdateUserDto): Observable<Empty>;
 
   deleteUser(request: UserIdRequest): Observable<Empty>;
+
+  getUserById(request: UserIdRequest): Observable<Auth0GetUserByIdResponse>;
 }
 
 export interface Auth0ServiceController {
@@ -51,11 +59,15 @@ export interface Auth0ServiceController {
   updateUser(request: Auth0UpdateUserDto): Promise<Empty> | Observable<Empty> | Empty;
 
   deleteUser(request: UserIdRequest): Promise<Empty> | Observable<Empty> | Empty;
+
+  getUserById(
+    request: UserIdRequest,
+  ): Promise<Auth0GetUserByIdResponse> | Observable<Auth0GetUserByIdResponse> | Auth0GetUserByIdResponse;
 }
 
 export function Auth0ServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createUser", "updateUser", "deleteUser"];
+    const grpcMethods: string[] = ["createUser", "updateUser", "deleteUser", "getUserById"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("Auth0Service", method)(constructor.prototype[method], method, descriptor);

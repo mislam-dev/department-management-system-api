@@ -1,6 +1,7 @@
 import { ExceptionFilter } from '@app/grpc/filters/exception.filter';
 import {
   Auth0CreateUserResponse,
+  Auth0GetUserByIdResponse,
   Auth0ServiceController,
   Auth0ServiceControllerMethods,
   Auth0UpdateUserDto,
@@ -45,6 +46,16 @@ import { CreateUserDto } from './dtos/auth0-create-user.dto';
 @Auth0ServiceControllerMethods()
 export class Auth0GrpcController implements Auth0ServiceController {
   constructor(private readonly auth0Service: Auth0Service) {}
+  async getUserById({
+    userId,
+  }: UserIdRequest): Promise<Auth0GetUserByIdResponse> {
+    const user = await this.auth0Service.getUser(userId);
+    return {
+      email: user.email,
+      username: user.username,
+      userId,
+    };
+  }
 
   async createUser(data: CreateUserDto): Promise<Auth0CreateUserResponse> {
     const user = await this.auth0Service.createUser(data);

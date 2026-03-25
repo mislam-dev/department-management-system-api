@@ -6,10 +6,16 @@ service Auth0Service {
   rpc CreateUser (Auth0CreateUserDto) returns (Auth0CreateUserResponse) {};
   rpc UpdateUser (Auth0UpdateUserDto) returns (Empty){};
   rpc DeleteUser (UserIdRequest) returns (Empty){};
+  rpc GetUserById (UserIdRequest) returns (Auth0GetUserByIdResponse){};
 }
 
 message Auth0CreateUserResponse {
   string user_id= 1;
+}
+message Auth0GetUserByIdResponse {
+  string user_id= 1;
+  optional string email= 2;
+  optional string username= 3;
 }
 
 message Auth0CreateUserDto {

@@ -20,6 +20,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
 import { ConversationService } from '../chat/conversation/conversation.service';
 import { MessageBodyDto } from './dtos/send-messge.dto';
+import { GrpcAuth0ServiceClient } from './grpc/auth0-service.client';
 import { JwtTokenService } from './jwt-token.service';
 import { WebsocketExceptionsFilter } from './web-socket-exception.filter';
 
@@ -41,6 +42,7 @@ export class ChatGateway implements OnGatewayConnection {
     private readonly chatService: ChatService,
     private readonly jwtTokenService: JwtTokenService,
     private readonly conversationService: ConversationService,
+    private readonly auth0Service: GrpcAuth0ServiceClient,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -61,14 +63,15 @@ export class ChatGateway implements OnGatewayConnection {
       token,
     )) as UserPayload;
 
-    // todo implement grpc to retrieve user data
-    // const user = await this.userService.findOneByAuth0Id(payload.sub);
-    const user = { id: 'user.id' };
-    const allConversations = await this.conversationService.findAll(user.id);
+    const user = await this.auth0Service.getAuth0UserById(payload.sub);
+
+    const allConversations = await this.conversationService.findAll(
+      user.userId,
+    );
     const ids = allConversations.map((conversation) => conversation.id);
     await client.join(ids);
 
-    client.handshake.auth = { ...payload, userId: 'user.id' };
+    client.handshake.auth = { ...payload, userId: user.userId };
   }
 
   @UsePipes(
