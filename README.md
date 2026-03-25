@@ -87,23 +87,23 @@ Department Management System (DMS) — a modular NestJS API for managing users, 
 ## Project Structure
 
 ```
-├── 📁 .husky
-├── 📁 public
-├── 📁 src
+├── 📁 apps
+│   ├── 📁 academic-service
+│   ├── 📁 auth-service
+│   ├── 📁 messenger-service
+│   ├── 📁 user-service
+│   ├── 📁 register-service
+│   └── 📁 docs-service
+├── 📁 libs
+│   ├── 📁 ai
 │   ├── 📁 common
-│   ├── 📁 core # database, auth, config, swagger, seeder
-│   ├── 📁 modules
-│   │   ├── 📁 academic # course, semester, schedule management
-│   │   ├── 📁 attendance # student attendance tracking
-│   │   ├── 📁 finance # payment gateways (Stripe, SSLCommerz)
-│   │   ├── 📁 identity # user & role management
-│   │   ├── 📁 messenger # real-time chat & websockets
-│   │   └── 📁 reporting # report generation
-│   ├── 📁 types # typescript types/interfaces
-│   ├── 📄 app.controller.ts
-│   ├── 📄 app.module.ts
-│   ├── 📄 app.service.ts
-│   └── 📄 main.ts
+│   └── 📁 grpc
+├── 📁 docker
+├── 🐳 Dockerfile
+├── 📄 Dockerfile.prod
+├── ⚙️ nest-cli.json
+├── ⚙️ package.json
+└── ⚙️ tsconfig.json
 ├── ⚙️ .dockerignore
 ├── ⚙️ .env.example
 ├── ⚙️ .gitignore
