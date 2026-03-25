@@ -5,10 +5,10 @@
 // source: libs/grpc/src/protos/auth0.proto
 
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'auth0';
+export const protobufPackage = "auth0";
 
 export interface Auth0CreateUserResponse {
   userId: string;
@@ -30,9 +30,10 @@ export interface UserIdRequest {
   userId: string;
 }
 
-export interface Empty {}
+export interface Empty {
+}
 
-export const AUTH0_PACKAGE_NAME = 'auth0';
+export const AUTH0_PACKAGE_NAME = "auth0";
 
 export interface Auth0ServiceClient {
   createUser(request: Auth0CreateUserDto): Observable<Auth0CreateUserResponse>;
@@ -45,47 +46,26 @@ export interface Auth0ServiceClient {
 export interface Auth0ServiceController {
   createUser(
     request: Auth0CreateUserDto,
-  ):
-    | Promise<Auth0CreateUserResponse>
-    | Observable<Auth0CreateUserResponse>
-    | Auth0CreateUserResponse;
+  ): Promise<Auth0CreateUserResponse> | Observable<Auth0CreateUserResponse> | Auth0CreateUserResponse;
 
-  updateUser(
-    request: Auth0UpdateUserDto,
-  ): Promise<Empty> | Observable<Empty> | Empty;
+  updateUser(request: Auth0UpdateUserDto): Promise<Empty> | Observable<Empty> | Empty;
 
-  deleteUser(
-    request: UserIdRequest,
-  ): Promise<Empty> | Observable<Empty> | Empty;
+  deleteUser(request: UserIdRequest): Promise<Empty> | Observable<Empty> | Empty;
 }
 
 export function Auth0ServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['createUser', 'updateUser', 'deleteUser'];
+    const grpcMethods: string[] = ["createUser", "updateUser", "deleteUser"];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(
-        constructor.prototype,
-        method,
-      );
-      GrpcMethod('Auth0Service', method)(
-        constructor.prototype[method],
-        method,
-        descriptor,
-      );
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcMethod("Auth0Service", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(
-        constructor.prototype,
-        method,
-      );
-      GrpcStreamMethod('Auth0Service', method)(
-        constructor.prototype[method],
-        method,
-        descriptor,
-      );
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcStreamMethod("Auth0Service", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const AUTH0_SERVICE_NAME = 'Auth0Service';
+export const AUTH0_SERVICE_NAME = "Auth0Service";

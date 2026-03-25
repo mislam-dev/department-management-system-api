@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { GrpcCourseScheduleServiceClient } from '../grpc/course-schedule.client';
 import { IsValidCourseScheduleIdConstraint } from './is-valid-course-schedule-id.validator';
 
 const mockId = 'uuid-id';
@@ -8,7 +9,15 @@ describe('IsValidCourseScheduleIdConstraint', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [IsValidCourseScheduleIdConstraint],
+      providers: [
+        IsValidCourseScheduleIdConstraint,
+        {
+          provide: GrpcCourseScheduleServiceClient,
+          useValue: {
+            getCourseScheduleById: jest.fn().mockResolvedValue(true),
+          },
+        },
+      ],
     }).compile();
 
     constraints = module.get<IsValidCourseScheduleIdConstraint>(

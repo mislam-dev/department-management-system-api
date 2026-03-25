@@ -1,4 +1,5 @@
 import { logger, LoggingInterceptor } from '@app/common/logger';
+import { COURSE_SCHEDULE_PACKAGE_NAME } from '@app/grpc/protos/course/course-schedule';
 import { SEMESTER_PACKAGE_NAME } from '@app/grpc/protos/semester';
 import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
@@ -17,11 +18,14 @@ async function bootstrap() {
   app.connectMicroservice({
     transport: Transport.GRPC,
     options: {
-      package: SEMESTER_PACKAGE_NAME,
+      package: [SEMESTER_PACKAGE_NAME, COURSE_SCHEDULE_PACKAGE_NAME],
       url: `0.0.0.0:${grpcPort}`,
       protoPath: [
         join(process.cwd(), 'libs/grpc/src/protos/semester.proto'),
-        // join(process.cwd(), 'libs/grpc/src/protos/academic.proto'),
+        join(
+          process.cwd(),
+          'libs/grpc/src/protos/course/course-schedule.proto',
+        ),
       ],
     },
   });

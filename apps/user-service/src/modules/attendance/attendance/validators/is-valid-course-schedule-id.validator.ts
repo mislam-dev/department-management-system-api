@@ -3,24 +3,26 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { setTimeout } from 'timers/promises';
+import { GrpcCourseScheduleServiceClient } from '../grpc/course-schedule.client';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class IsValidCourseScheduleIdConstraint
   implements ValidatorConstraintInterface
 {
+  constructor(
+    private readonly grpcCourseScheduleServiceClient: GrpcCourseScheduleServiceClient,
+  ) {}
   async validate(courseScheduleId: string) {
     if (!courseScheduleId) return false;
 
     try {
-      // TODO: implement this via grpc
-      // const exists = await this.courseSchedule.findOne(courseScheduleId);
-      // return !!exists;
-      await setTimeout(0);
-      return true;
-    } catch (e) {
-      console.log(e);
+      const exists =
+        await this.grpcCourseScheduleServiceClient.getCourseScheduleById(
+          courseScheduleId,
+        );
+      return !!exists;
+    } catch {
       return false;
     }
   }

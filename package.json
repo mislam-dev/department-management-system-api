@@ -21,7 +21,7 @@
     "test:e2e": "jest --config ./apps/dms/apps/service/dms/test/jest-e2e.json",
     "husky:prepare": "husky",
     "seed": "ts-node -r tsconfig-paths/register src/seeder/seed.ts",
-    "proto:gen": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ --ts_proto_opt=nestJs=true --ts_proto_opt=esModuleInterop=true ./libs/grpc/src/**/*.proto"
+    "proto:gen": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ --ts_proto_opt=nestJs=true --ts_proto_opt=esModuleInterop=true ./libs/grpc/src/protos/**/*.proto"
   },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",

@@ -5,10 +5,10 @@
 // source: libs/grpc/src/protos/semester.proto
 
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'semester';
+export const protobufPackage = "semester";
 
 export interface SemesterResponse {
   id: string;
@@ -19,9 +19,10 @@ export interface SemesterIdRequest {
   id: string;
 }
 
-export interface Empty {}
+export interface Empty {
+}
 
-export const SEMESTER_PACKAGE_NAME = 'semester';
+export const SEMESTER_PACKAGE_NAME = "semester";
 
 export interface SemesterServiceClient {
   getSemesterById(request: SemesterIdRequest): Observable<SemesterResponse>;
@@ -30,39 +31,22 @@ export interface SemesterServiceClient {
 export interface SemesterServiceController {
   getSemesterById(
     request: SemesterIdRequest,
-  ):
-    | Promise<SemesterResponse>
-    | Observable<SemesterResponse>
-    | SemesterResponse;
+  ): Promise<SemesterResponse> | Observable<SemesterResponse> | SemesterResponse;
 }
 
 export function SemesterServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['getSemesterById'];
+    const grpcMethods: string[] = ["getSemesterById"];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(
-        constructor.prototype,
-        method,
-      );
-      GrpcMethod('SemesterService', method)(
-        constructor.prototype[method],
-        method,
-        descriptor,
-      );
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcMethod("SemesterService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(
-        constructor.prototype,
-        method,
-      );
-      GrpcStreamMethod('SemesterService', method)(
-        constructor.prototype[method],
-        method,
-        descriptor,
-      );
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcStreamMethod("SemesterService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const SEMESTER_SERVICE_NAME = 'SemesterService';
+export const SEMESTER_SERVICE_NAME = "SemesterService";

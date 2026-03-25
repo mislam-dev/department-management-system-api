@@ -5,6 +5,7 @@ import { CourseModule } from '../course/course.module';
 import { CourseScheduleController } from './course_schedule.controller';
 import { CourseScheduleService } from './course_schedule.service';
 import { CourseSchedule } from './entities/course_schedule.entity';
+import { GrpcCourseScheduleController } from './grpc-course_schedule.controller';
 import { HasNoScheduleOverlapConstraint } from './validators/has-no-schedule-overlap.validator';
 import { IsRoomAvailableConstraint } from './validators/is-room-available.validator';
 import { IsTeacherAvailableConstraint } from './validators/is-teacher-available.validator';
@@ -12,7 +13,7 @@ import { IsUniqueScheduleConstraint } from './validators/is-unique-schedule.vali
 import { IsValidTimeRangeConstraint } from './validators/is-valid-time-range.validator';
 
 @Module({
-  controllers: [CourseScheduleController],
+  controllers: [CourseScheduleController, GrpcCourseScheduleController],
   providers: [
     CourseScheduleService,
     IsUniqueScheduleConstraint,
