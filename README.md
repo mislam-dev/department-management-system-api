@@ -28,6 +28,33 @@ This major release introduces several months of development, bringing powerful n
 
 ---
 
+## 🏗️ Advanced Infrastructure & Distributed Systems
+
+DMS has evolved into a robust **Distributed Microservices Architecture**, ensuring high availability and scalability.
+
+### 🔌 Inter-Service Communication (gRPC)
+We use **gRPC** with **Protobuf** definitions (`libs/grpc`) for lightning-fast, type-safe communication between internal services. This drastically reduces latency compared to traditional REST APIs for internal workflows.
+
+### 🛡️ API Gateway (Kong)
+All external requests flow through **Kong Gateway**. It handles:
+- **Centralized Routing**: Directs client requests to the appropriate microservice.
+- **Authentication & Security**: Integrated with Auth0 for JWT validation at the edge.
+- **Rate Limiting & Plugins**: Dynamically managed via declarative configuration (`docker/kong/kong.yaml`).
+
+### 📊 Full-Stack Observability
+Our monitoring stack provides deep insights into system health and performance:
+- **Metrics**: Collected via **Prometheus** and visualized in **Grafana**.
+- **Logging**: Log aggregation using **Loki** and **Promtail** for centralized querying.
+- **Error Tracing**: Real-time error capture and alerting using **Sentry**.
+
+### ⚙️ Monorepo Orchestration
+The project is managed as a monorepo using **pnpm workspaces** and **NestJS monorepo mode**. Shared logic is encapsulated in libraries:
+- `libs/ai`: AI Agent utilities.
+- `libs/grpc`: Shared proto definitions and generated gRPC clients.
+- `libs/common`: Core utilities, decorators, and shared filters.
+
+---
+
 ## 🛠 Chores, DX, & Technical Debt
 
 ### Architecture & Developer Experience (DX)
@@ -167,44 +194,20 @@ cd dms-api
 pnpm install
 ```
 
-3. Create environment file
+3. Generate gRPC Types
+```bash
+pnpm run proto:gen
+```
+
+4. Create environment file
 
 Copy `.env.example` (if present) to `.env` and populate required values:
 
 ```bash
 cp .env.example .env
-```
+  r compose up --build
 
-4. Run database migrations / sync
-
-Depending on the project configuration you may either run migrations or rely on TypeORM sync
-
-5. Run the app
-
-Development:
-
-```bash
-pnpm run start:dev
-```
-
-Production (build + start):
-
-```bash
-pnpm run build
-pnpm run start:prod
-```
-
-6. API documentation
-
-After the app is running, open the Swagger UI (default path: `/docs`).
-
-7. Docker (optional)
-
-Build and run with Docker Compose:
-
-```bash
-docker compose up --build
-```
+````
 
 Or use the provided `Dockerfile` and `docker-compose.yaml` for customization.
 
@@ -214,7 +217,7 @@ Or use the provided `Dockerfile` and `docker-compose.yaml` for customization.
 
 ```bash
 pnpm run test
-```
+````
 
 - E2E tests:
 
