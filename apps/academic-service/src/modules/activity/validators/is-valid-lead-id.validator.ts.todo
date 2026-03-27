@@ -1,0 +1,12 @@
+
+✔ Implement grpc on UserService @started(26-03-25 16:29) @done(26-03-25 16:50) @lasted(21m2s)
+  ✔ create proto file and generate ts file @started(26-03-25 16:29) @done(26-03-25 16:35) @lasted(6m52s)
+  ✔ create and start microservice on user-service @started(26-03-25 16:35) @done(26-03-25 16:42) @lasted(7m57s)
+  ✔ create grpc controller with proto files interfaces @started(26-03-25 16:42) @done(26-03-25 16:49) @lasted(7m51s)
+✔ Implement on academic-service and validate lead @started(26-03-25 17:12) @done(26-03-25 17:26) @lasted(14m15s)
+  ✔ create client-module on academic-service @started(26-03-25 17:12) @done(26-03-25 17:12) @lasted(43s)
+  ✔ update module to register grpc client @started(26-03-25 17:12) @done(26-03-25 17:21) @lasted(9m28s)
+  ✔ update validator to use grpc client @started(26-03-25 17:21) @done(26-03-25 17:23) @lasted(2m18s)
+  ✔ update module test cases @started(26-03-25 17:24) @done(26-03-25 17:24) @lasted(1m1s)
+  ✔ debugging @started(26-03-25 17:25) @done(26-03-25 17:26) @lasted(1m11s)
+  ✔ update todo list @done(26-03-25 17:26)

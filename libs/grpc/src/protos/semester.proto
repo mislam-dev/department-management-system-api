@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package semester;
+
+
+service SemesterService {
+  rpc GetSemesterById (SemesterIdRequest) returns (SemesterResponse){};
+  
+}
+
+
+message SemesterResponse {
+  string id = 1;
+  string name = 2;
+}
+
+message SemesterIdRequest {
+  string id = 1;
+}
+
+message Empty {
+}

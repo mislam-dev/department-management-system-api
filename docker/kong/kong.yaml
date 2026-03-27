@@ -1,0 +1,221 @@
+_format_version: '3.0'
+_transform: true
+
+services:
+  - name: docs-service
+    protocol: http
+    host: docs_service
+    port: 3007
+
+    routes:
+      # --- PUBLIC ROUTES ---
+      # Put the paths that don't need authentication here.
+      # Because these paths are longer, Kong will match them first.
+      - name: docs-routes
+        paths:
+          - /docs
+          - /docs/
+        methods:
+          - GET
+          - HEAD
+          - OPTIONS
+        strip_path: true
+        preserve_host: true
+        protocols:
+          - http
+          - https
+
+  - name: auth-service
+    protocol: http
+    host: auth_service
+    port: 3002
+
+    routes:
+      # --- PUBLIC ROUTES ---
+      # Put the paths that don't need authentication here.
+      # Because these paths are longer, Kong will match them first.
+      - name: auth-public-routes
+        paths:
+          - /login
+          - /auth/callback
+        methods:
+          - GET
+          - POST
+          - HEAD
+          - OPTIONS
+        strip_path: false
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+      # --- PROTECTED ROUTES ---
+      # Put the base path here. Requests not matching the public routes
+      # will fall back to this route and hit the JWT plugin.
+      - name: auth-protected-routes
+        paths:
+          - /api/v1/auth
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        # Move the plugin here, so it only affects this route
+        plugins:
+          - name: jwt-keycloak
+            config:
+              # Auth0 Discovery endpoint
+              allowed_iss: ['https://${AUTH0_DOMAIN}/']
+
+  - name: user-service
+    protocol: http
+    host: user_service
+    port: 3003
+
+    routes:
+      # --- PROTECTED ROUTES ---
+      # Put the base path here. Requests not matching the public routes
+      # will fall back to this route and hit the JWT plugin.
+      - name: user-protected-routes
+        paths:
+          - /api/v1/user
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - OPTIONS
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        # Move the plugin here, so it only affects this route
+        plugins:
+          - name: jwt-keycloak
+            config:
+              # Auth0 Discovery endpoint
+              allowed_iss: ['https://${AUTH0_DOMAIN}/']
+
+  - name: register-service
+    protocol: http
+    host: register_service
+    port: 3005
+
+    routes:
+      # --- PROTECTED ROUTES ---
+      # Put the base path here. Requests not matching the public routes
+      # will fall back to this route and hit the JWT plugin.
+      - name: finance-routes
+        paths:
+          - /api/v1/finance
+          - /api/v1/reporting
+          - /api/v1/payment
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        # Move the plugin here, so it only affects this route
+        plugins:
+          - name: jwt-keycloak
+            config:
+              # Auth0 Discovery endpoint
+              allowed_iss: ['https://${AUTH0_DOMAIN}/']
+
+  - name: academic-service
+    protocol: http
+    host: academic_service
+    port: 3004
+
+    routes:
+      - name: academic-routes
+        paths:
+          - /api/v1/academic
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        # Move the plugin here, so it only affects this route
+        plugins:
+          - name: jwt-keycloak
+            config:
+              # Auth0 Discovery endpoint
+              allowed_iss: ['https://${AUTH0_DOMAIN}/']
+
+  - name: messenger-service
+    protocol: http
+    host: messenger_service
+    port: 3006
+
+    routes:
+      - name: messenger-routes
+        paths:
+          - /api/v1/messenger
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        # Move the plugin here, so it only affects this route
+        plugins:
+          - name: jwt-keycloak
+            config:
+              # Auth0 Discovery endpoint
+              allowed_iss: ['https://${AUTH0_DOMAIN}/']
+
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 60
+      hour: 3600
+      policy: local
+      fault_tolerant: true
+
+  - name: cors
+    config:
+      origins:
+        - http://localhost:3000
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Authorization
+        - Content-Type
+        - Origin
+        - X-Requested-With
+      exposed_headers:
+        - Authorization
+      credentials: true
+      max_age: 3600
+      preflight_continue: false
+
+  - name: response-transformer
+    config:
+      add:
+        headers:
+          - X-Powered-By:Kong
+      remove:
+        headers:
+          - Server
