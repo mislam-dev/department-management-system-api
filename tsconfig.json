@@ -43,6 +43,9 @@
       ],
       "@app/grpc/*": [
         "libs/grpc/src/*"
+      ],
+      "face-api.js": [
+        "node_modules/face-api.js/build/commonjs/index.d.ts"
       ]
     }
   }

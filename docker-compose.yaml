@@ -245,6 +245,48 @@ services:
     networks:
       - dms_default
 
+  face_detection_service:
+    build:
+      context: .
+      dockerfile: ./apps/face-detection-service/Dockerfile
+    container_name: dms-face-detection-service
+    # ports:
+    #   - 3008:3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file: ./apps/face-detection-service/.env
+    environment:
+      PORT: 3008
+      DB_HOST: face_detection_db
+      DB_NAME: face-detection
+    restart: unless-stopped
+    command: pnpm start:dev face-detection-service
+    networks:
+      - dms_default
+      - face_detection_service
+    depends_on:
+      face_detection_db:
+        condition: service_healthy
+
+  face_detection_db:
+    image: pgvector/pgvector:pg16
+    container_name: dms-face-detection-database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: face-detection
+    volumes:
+      - face_detection_data:/var/lib/postgresql/data
+      - ./apps/face-detection-service/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - face_detection_service
+
 volumes:
   dms_data:
   dms_redis_data:
@@ -255,6 +297,7 @@ volumes:
   dms_register_redis_data:
   messenger_service_data:
   dms_messenger_redis_data:
+  face_detection_data:
 
 networks:
   dms_default:
@@ -266,4 +309,6 @@ networks:
   register_service:
     driver: bridge
   messenger_service:
+    driver: bridge
+  face_detection_service:
     driver: bridge

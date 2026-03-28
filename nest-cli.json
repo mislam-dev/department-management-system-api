@@ -127,6 +127,21 @@
       "compilerOptions": {
         "tsConfigPath": "apps/user-service/tsconfig.app.json"
       }
+    },
+    "face-detection-service": {
+      "type": "application",
+      "root": "apps/face-detection-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/face-detection-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/face-detection-service/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "models/**/*",
+            "watchAssets": true
+          }
+        ]
+      }
     }
   }
 }
